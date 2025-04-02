@@ -4,24 +4,28 @@ namespace App\Livewire\Karyawan;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use Illuminate\Support\Facades\Session;
 
 class CreateKaryawan extends Component
 {
+    public $nama, $email;
+
     public function store()
     {
         $this->validate([
             'nama' => 'required|string|max:255',
-            'email' => 'required|integer',
+            'email' => 'required|email',
         ]);
 
-        User::create_functionreate([
+        User::create([
             'name' => $this->nama,
-            'email' => $this->kapasitas,
+            'email' => $this->email,
             'password' => Hash::make('password')
         ]);
 
-        session()->flash('message', $this->kandang_id ? 'Data diperbarui!' : 'Data ditambahkan!');
-        $this->closeModal();
+        session()->flash('success', 'Data ditambahkan! ');
+        return redirect()->route('karyawan'); 
     }
 
     public function render()
