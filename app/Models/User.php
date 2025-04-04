@@ -25,7 +25,10 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
-        'nama_kandang'
+    ];
+
+    protected $casts = [
+        'is_admin' => 'boolean',
     ];
 
     /**
@@ -50,9 +53,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function kandang(): HasOne
+    public function kandang()
     {
-        return $this->hasOne(kandang::class); 
+        return $this->hasOne(Kandang::class); 
     }
     public function karyawan(): HasOne
     {

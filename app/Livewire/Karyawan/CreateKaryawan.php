@@ -21,7 +21,8 @@ class CreateKaryawan extends Component
         User::create([
             'name' => $this->nama,
             'email' => $this->email,
-            'password' => Hash::make('password')
+            'password' => Hash::make('password'),
+            'is_admin' => 0
         ]);
 
         session()->flash('success', 'Data ditambahkan! ');

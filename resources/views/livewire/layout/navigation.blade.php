@@ -33,18 +33,22 @@ new class extends Component
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('karyawan')" :active="request()->routeIs('karyawan')"  wire:navigate>
-                        {{ __('Karyawan') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('kandang')" :active="request()->routeIs('kandang')"  wire:navigate>
-                        {{ __('Kandang') }}
-                    </x-nav-link>
-                    <x-nav-link  wire:navigate>
-                        {{ __('Ayam') }}
-                    </x-nav-link>
-                    <x-nav-link  wire:navigate>
-                        {{ __('Telur') }}
-                    </x-nav-link>
+                    @can('admin')
+                        <x-nav-link :href="route('karyawan')" :active="request()->routeIs('karyawan')"  wire:navigate>
+                            {{ __('Karyawan') }}
+                        </x-nav-link>
+                    @endcan
+                    @cannot('admin')
+                        <x-nav-link :href="route('kandang')" :active="request()->routeIs('kandang')"  wire:navigate>
+                            {{ __('Kandang') }}
+                        </x-nav-link>
+                        <x-nav-link  wire:navigate>
+                            {{ __('Ayam') }}
+                        </x-nav-link>
+                        <x-nav-link  wire:navigate>
+                            {{ __('Telur') }}
+                        </x-nav-link>
+                    @endcannot
                     <x-nav-link  wire:navigate>
                         {{ __('Pakan') }}
                     </x-nav-link>

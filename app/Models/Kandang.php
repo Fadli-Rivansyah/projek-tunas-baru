@@ -11,12 +11,14 @@ use App\Models\Telur;
 class Kandang extends Model
 {
     protected $fillable = [
+        'nama_karyawan',
         'nama_kandang',
         'umur_ayam',
-        'jumlah_ayam'
+        'jumlah_ayam',
+        'user_id'
     ];
 
-    public function admin(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
