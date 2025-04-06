@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('ayams', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kandang_id')->constrained()->onDelete('cascade');
-            $table->integer('jumlah_ayam_hidup');
             $table->integer('jumlah_ayam_mati');
             $table->integer('jumlah_pakan');
             $table->date('tanggal');

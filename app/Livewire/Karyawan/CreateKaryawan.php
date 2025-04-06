@@ -5,7 +5,6 @@ namespace App\Livewire\Karyawan;
 use Livewire\Component;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use Illuminate\Support\Facades\Session;
 
 class CreateKaryawan extends Component
 {
@@ -25,8 +24,8 @@ class CreateKaryawan extends Component
             'is_admin' => 0
         ]);
 
-        session()->flash('success', 'Data ditambahkan! ');
-        return redirect()->route('karyawan'); 
+        $this->reset();
+        return redirect()->route('karyawan')->with('success', 'Data karyawan berhasil ditambahkan.');
     }
 
     public function render()

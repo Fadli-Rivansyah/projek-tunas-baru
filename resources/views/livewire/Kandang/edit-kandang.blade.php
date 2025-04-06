@@ -6,9 +6,9 @@
     </x-slot>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <form class="max-w-xl grid grid-cols-2 gap-5" wire:submit.prevent="save">
+            <form class="max-w-xl grid grid-cols-2 gap-5" wire:submit.prevent="editKandang">
                 <div class="mb-5">
-                    <label for="nama_kandang" class="block mb-2 text-sm font-medium text-gray-900 ">Nama Kandang <span class="text-bold text-red-500">*</span></label>
+                    <label for="nama_kandang" class="block mb-2 text-sm font-medium text-gray-900 ">Nama Kandang</label>
                     <input type="text" wire:model="nama_kandang" name="nama_kandang" id="nama_kandang" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500  mb-2 block w-full p-2.5" required />
                     @error('nama_kandang') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
@@ -17,12 +17,12 @@
                     <input type="text" wire:model="nama_karyawan" name="nama_karyawan" id="nama_karyawan" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full p-2.5" disabled  required />
                 </div>
                 <div class="mb-5">
-                    <label for="jumlah_ayam" class="block mb-2 text-sm font-medium text-gray-900 ">Jumlah Ayam <span class="text-bold text-red-500">*</span></label>
+                    <label for="jumlah_ayam" class="block mb-2 text-sm font-medium text-gray-900 ">Jumlah Ayam</label>
                     <input type="text" wire:model="jumlah_ayam" name="jumlah_ayam" id="jumlah_ayam" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 mb-2  block w-full p-2.5" required />
                     @error('jumlah_ayam') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <div class="mb-5">
-                    <label for="umur_ayam" class="block mb-2 text-sm font-medium text-gray-900 ">Umur Ayam (Minggu) <span class="text-bold text-red-500">*</span></label>
+                    <label for="umur_ayam" class="block mb-2 text-sm font-medium text-gray-900 ">Umur Ayam (Minggu)</label>
                     <input type="text" wire:model="umur_ayam" name="umur_ayam" id="umur_ayam" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-50 mb-2 0 block w-full p-2.5" required />
                     @error('umur_ayam') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>

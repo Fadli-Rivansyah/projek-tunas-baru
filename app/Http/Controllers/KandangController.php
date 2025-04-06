@@ -15,4 +15,11 @@ class KandangController extends Controller
         ]);
     }
     
+    public function destroy($id)
+    {
+        $kandang = Kandang::findOrFail($id);
+        $kandang->delete();
+
+        return redirect()->route('kandang')->with('success', 'Data kandang berhasil dihapus!');
+    }
 }

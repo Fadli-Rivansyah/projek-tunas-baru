@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Ayam extends Model
 {
     protected $fillable = [
-        'jumlah_ayam_hidup',
+        'kandang_id',
         'jumlah_ayam_mati',
-        'pakan',
+        'jumlah_pakan',
         'tanggal',
     ];
+
+    public function kandang()
+    {
+        return $this->belongsTo(Kandang::class);
+    }
 }

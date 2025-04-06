@@ -43,12 +43,18 @@
                                     {{ $item->email }}
                                 </td>
                                 <td class="px-6 py-4">
-                                {{ optional($item->kandang)->nama_kandang ?? '-' }}
+                                    {{ optional($item->kandang)->nama_kandang ?? '-' }}
                                 </td>
                                 <td class="px-6 inline-flex gap-3 py-4">
                                     <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</a>
-                                    <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                                    <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Delete</a>
+                                    <a href="{{route('karyawan.edit', $item->id)}}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                                    <div>
+                                        <form action="{{ route('karyawan.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger">Hapus</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

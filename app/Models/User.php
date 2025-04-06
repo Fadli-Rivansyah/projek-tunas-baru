@@ -57,14 +57,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Kandang::class); 
     }
-    public function karyawan(): HasOne
-    {
-        return $this->hasOne(karyawan::class); 
-    }
-
+ 
     public function ayam(): HasMany
     {
-        return $this->hasOne(Ayam::class); 
+        return $this->hasMany(Ayam::class); 
 
     }
 }

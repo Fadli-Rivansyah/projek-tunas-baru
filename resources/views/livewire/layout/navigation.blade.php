@@ -42,7 +42,7 @@ new class extends Component
                         <x-nav-link :href="route('kandang')" :active="request()->routeIs('kandang')"  wire:navigate>
                             {{ __('Kandang') }}
                         </x-nav-link>
-                        <x-nav-link  wire:navigate>
+                        <x-nav-link :href="route('ayam')" :active="request()->routeIs('ayam')" wire:navigate>
                             {{ __('Ayam') }}
                         </x-nav-link>
                         <x-nav-link  wire:navigate>

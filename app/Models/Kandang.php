@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
+use App\Models\Ayam;
 use App\Models\Telur;
 
 class Kandang extends Model
@@ -26,5 +27,10 @@ class Kandang extends Model
     public function telur(): HasMany
     {
         return $this->hasMany(Telur::class);
+    }
+
+    public function ayams(): HasMany
+    {
+        return $this->hasMany(Ayam::class);
     }
 }
