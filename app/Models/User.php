@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Kandang;
 use App\Models\Ayam;
+use App\Models\Telur;
 use App\Models\Karyawan;
 
 class User extends Authenticatable
@@ -18,6 +19,7 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
+     * 
      * @var list<string>
      */
     protected $fillable = [
@@ -58,9 +60,13 @@ class User extends Authenticatable
         return $this->hasOne(Kandang::class); 
     }
  
-    public function ayam(): HasMany
+    public function ayam()
     {
-        return $this->hasMany(Ayam::class); 
+        return $this->hasOne(Ayam::class); 
+    }
 
+    public function telur()
+    {
+        return $this->hasOne(Telur::class); 
     }
 }

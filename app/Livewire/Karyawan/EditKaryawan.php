@@ -4,6 +4,7 @@ namespace App\Livewire\Karyawan;
 
 use Livewire\Component;
 use App\Models\User;
+use Livewire\Attributes\Title;
 
 class EditKaryawan extends Component
 {
@@ -32,6 +33,7 @@ class EditKaryawan extends Component
         return redirect()->route('karyawan')->with('success', 'Data karyawan berhasil diubah.');
     }
 
+    #[Title('Edit Karyawan')] 
     public function render()
     {
         return view('livewire.karyawan.edit-karyawan')->layout('layouts.app');

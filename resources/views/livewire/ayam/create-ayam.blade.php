@@ -9,8 +9,14 @@
             <form class="max-w-xl" wire:submit.prevent="save">
                 <div class=" grid grid-cols-2 gap-x-5">
                     <div class="mb-5">
+                        <label for="total_ayam" class="block mb-2 text-sm font-medium text-gray-900 ">Total Ayam <span class="text-bold text-red-500">*</span></label>
+                        <input type="text" wire:model="total_ayam" name="total_ayam" id="total_ayam" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full p-2.5" required />
+                        @error('total_ayam') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="mb-5">
                         <label for="jumlahAyam_mati" class="block mb-2 text-sm font-medium text-gray-900 ">Jumlah Ayam Mati <span class="text-bold text-red-500">*</span></label>
                         <input type="text" wire:model="jumlahAyam_mati" name="jumlahAyam_mati" id="jumlahAyam_mati" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full p-2.5" required />
+                        @error('jumlahAyam_mati') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                     <div class="mb-5">
                         <label for="pakan" class="block mb-2 text-sm font-medium text-gray-900 ">Pakan(kg) <span class="text-bold text-red-500">*</span></label>

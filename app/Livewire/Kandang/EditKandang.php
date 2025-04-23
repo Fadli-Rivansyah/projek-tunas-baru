@@ -43,7 +43,7 @@ class EditKandang extends Component
         ]);
 
         $this->reset();
-        return redirect()->route('karyawan')->with('success', 'Data kandang berhasil dibuat.');
+        return redirect()->route('kandang')->with('success', 'Data kandang berhasil dibuat.');
     }
 
     public function render()

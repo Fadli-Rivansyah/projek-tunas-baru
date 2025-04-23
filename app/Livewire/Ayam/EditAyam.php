@@ -8,15 +8,26 @@ use App\Models\Kandang;
 
 class EditAyam extends Component
 {
-    public $ayam_id, $jumlahAyam_mati, $pakan, $tanggal;
+    public $ayam, $kandang;
+    public $jumlahAyam_mati, $pakan, $tanggal, $total_ayam;
 
     public function mount($id)
     {
+        // user relation
+        $user = auth()->user();
+        $kandang = $user->kandang;
+        $this->kandang = $kandang;
+
         $ayam = Ayam::findOrFail($id);
+        $this->ayam = $ayam;
+
+        // tampilkan ke form input
         $this->jumlahAyam_mati = $ayam->jumlah_ayam_mati;
         $this->pakan = $ayam->jumlah_pakan;
         $this->tanggal = $ayam->tanggal;
-        $this->ayam_id = $id;
+
+        $ayamMati = Ayam::where('kandang_id', $kandang?->id)->sum('jumlah_ayam_mati');
+        $this->total_ayam = $kandang?->jumlah_ayam - $ayamMati;
     }
 
     public function editAyam(){
@@ -32,11 +43,11 @@ class EditAyam extends Component
             'tanggal.required' => 'Tanggal harus diisi',
         ]);
 
-        $kandang = Kandang::findOrFail(auth()->user()->kandang?->id);
-        // create
-        $data = Ayam::findOrFail($this->ayam_id);
-        $data->update([
-            'kandang_id' =>$kandang->id,
+        
+        $this->ayam->update([
+            'user_id' => auth()->user()->id,
+            'kandang_id' => $this->kandang->id,
+            'total_ayam' => $this->total_ayam,
             'jumlah_ayam_mati' => $this->jumlahAyam_mati,
             'jumlah_pakan' => $this->pakan,
             'tanggal' => $this->tanggal,

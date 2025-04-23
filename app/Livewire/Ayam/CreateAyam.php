@@ -5,10 +5,24 @@ namespace App\Livewire\Ayam;
 use Livewire\Component;
 use App\Models\Ayam;
 use App\Models\Kandang;
+use App\Models\Pakan;
+use Carbon\Carbon;
 
 class CreateAyam extends Component
 {
-    public  $jumlahAyam_mati, $pakan, $tanggal;
+    public  $jumlahAyam_mati, $pakan, $tanggal, $total_ayam;
+    public $kandang;
+
+    public function mount()
+    {
+        // user relation
+        $user = auth()->user();
+        $kandang = $user->kandang;
+        $this->kandang = $kandang;
+
+        $ayam = Ayam::where('kandang_id', $kandang->id)->sum('jumlah_ayam_mati') - $kandang->jumlah_ayam ?? $kandang->jumlah_ayam;
+        $this->total_ayam =abs($ayam);
+    }
 
     public function save()
     {
@@ -24,21 +38,40 @@ class CreateAyam extends Component
             'tanggal.required' => 'Tanggal harus diisi',
         ]);
 
-        $kandang = Kandang::findOrFail(auth()->user()->kandang?->id);
         // create
-        Ayam::create([
-            'kandang_id' =>$kandang->id,
+        $pakan = Pakan::latest()->first();
+
+        $pakan->decrement('jumlah_jagung', $this->pakan/2);
+        $pakan->decrement('jumlah_multivitamin', $this->pakan/2);
+
+        if ($pakan->jumlah_jagung < $this->pakan || $pakan->jumlah_multivitamin < $this->pakan) 
+        {
+            session()->flash('error', 'Stok jagung atau multivitamin tidak cukup.');
+            return;
+        }
+
+        $tanggalSekarang = Carbon::today();
+
+        // $ayam = Ayam::where('kandang_id', $this->kandang->id)
+        //     ->where('tanggal', '<', $tanggalSekarang)
+        //     ->orderBy('tanggal', 'desc')
+        //     ->first();
+
+            Ayam::create([
+            'user_id' => auth()->user()->id,
+            'kandang_id' =>$this->kandang->id,
+            'total_ayam' => $this->total_ayam,
             'jumlah_ayam_mati' => $this->jumlahAyam_mati,
             'jumlah_pakan' => $this->pakan,
             'tanggal' => $this->tanggal,
         ]);
 
         $this->reset();
-        return redirect()->route('ayam')->with('success', 'Data kandang berhasil dibuat.');
+        return redirect()->route('ayam')->with('success', 'Data ayam berhasil dibuat.');
     }
 
     public function render()
     {
-        return view('livewire.ayam.create-ayam')->layout('layouts.app');;
+        return view('livewire.ayam.create-ayam')->layout('layouts.app');
     }
 }

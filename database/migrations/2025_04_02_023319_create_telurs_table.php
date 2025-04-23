@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('telurs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('kandang_id')->constrained()->onDelete('cascade');
             $table->integer('jumlah_telur_bagus');
             $table->integer('jumlah_telur_retak');
