@@ -5,6 +5,7 @@ namespace App\Livewire\Telur;
 use Livewire\Component;
 use App\Models\Telur;
 use App\Models\Kandang;
+use Livewire\Attributes\Title;
 
 class EditTelur extends Component
 {
@@ -49,6 +50,7 @@ class EditTelur extends Component
         return redirect()->route('telur')->with('success', 'Data telur berhasil diubah.');
     }
 
+    #[Title('Edit Telur')] 
     public function render()
     {
         return view('livewire.telur.edit-telur')->layout('layouts.app');

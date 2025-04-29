@@ -25,10 +25,14 @@ class CreatePakan extends Component
             'tanggal.required' => 'Tanggal harus diisi',
         ]);
 
+        $totalFeed = $this->jagung + $this->multivitamin;
+
         // create
         Pakan::create([
+            'total_pakan' => $totalFeed,
             'jumlah_jagung' => $this->jagung,
             'jumlah_multivitamin' => $this->multivitamin,
+            'sisa_pakan' => $totalFeed,
             'tanggal' => $this->tanggal,
         ]);
 

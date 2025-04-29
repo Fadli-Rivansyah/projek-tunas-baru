@@ -4,6 +4,7 @@ namespace App\Livewire\Kandang;
 
 use Livewire\Component;
 use App\Models\Kandang;
+use Livewire\Attributes\Title;
 
 class EditKandang extends Component
 {
@@ -46,6 +47,7 @@ class EditKandang extends Component
         return redirect()->route('kandang')->with('success', 'Data kandang berhasil dibuat.');
     }
 
+    #[Title('Edit Data Kandang')] 
     public function render()
     {
         return view('livewire.kandang.edit-kandang')->layout('layouts.app');;

@@ -29,7 +29,6 @@ class EditKaryawan extends Component
             'email' => $this->email,
         ]);
 
-        $this->reset();
         return redirect()->route('karyawan')->with('success', 'Data karyawan berhasil diubah.');
     }
 

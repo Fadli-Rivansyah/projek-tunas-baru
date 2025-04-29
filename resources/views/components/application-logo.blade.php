@@ -3,6 +3,6 @@
 </svg> --}}
 
 <a href="/" class="flex items-center mb-4 sm:mb-0 space-x-3 rtl:space-x-reverse">
-    <img src="/img/logo.png" class="h-36" alt="Logo " />
+    <img src="/img/logo.png" width="130" height="130" class="z-1" alt="Logo " loading="lazy">
     {{-- <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span> --}}
 </a>

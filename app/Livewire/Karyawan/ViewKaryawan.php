@@ -6,6 +6,7 @@ use Livewire\Component;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Title;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\User;
 use App\Models\Telur;
 use App\Models\Ayam;
@@ -60,16 +61,16 @@ class ViewKaryawan extends Component
 
         if ($kandang) {
             $dataAyam = $kandang->ayam()
-            ->whereBetween('tanggal', [$start, $end])
-            ->get()
-            ->groupBy('tanggal');
+                ->whereBetween('tanggal', [$start, $end])
+                ->get()
+                ->groupBy('tanggal');
     
             $dataTelur = $kandang->telur()
                 ->whereBetween('tanggal', [$start, $end])
                 ->get()
                 ->groupBy('tanggal');
 
-                $allDates = collect($dataAyam->keys())
+            $allDates = collect($dataAyam->keys())
                 ->merge($dataTelur->keys())
                 ->unique()
                 ->sort();
@@ -152,6 +153,45 @@ class ViewKaryawan extends Component
             'crackedEggs' => $crackedEggs,
             'goodEggs' => $goodEggs,
         ];
+    }
+
+    
+    public function exportPdf()
+    {
+        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
+        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
+
+        $data = $this->getSummaryEmployeeProperty();
+
+        $liveChickens = 0;
+        $deadChickens = 0;
+        $totalEggs = 0;
+        $crackedEggs = 0;
+
+        foreach ($data as $item) {
+            $liveChickens += $item['liveChickens'];
+            $deadChickens += $item['deadChickens'];
+            $totalEggs += $item['productionEggs'];
+            $crackedEggs += $item['crackedEggs'];
+        }
+
+        $bulan = nama_bulan($this->bulan);
+        $tahun = $this->tahun;
+        
+        $pdf = Pdf::loadView('livewire.karyawan.export-karyawan-pdf', [
+            'data' => $data,
+            'bulan' => $bulan,
+            'tahun' => $tahun,
+            'liveChickens' =>number_format($liveChickens, 0, ',', '.'),
+            'deadChickens' => number_format($deadChickens, 0, ',', '.'),
+            'totalEggs' => number_format($totalEggs, 0, ',', '.'),
+            'crackedEggs' => number_format($crackedEggs, 0, ',', '.'),
+            'totalChickenCoops' => $this->kandang?->nama_kandang,
+        ]);
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, "laporan-telur-{$bulan}-{$tahun}.pdf");
     }
 
     #[Title('View Karyawan')] 

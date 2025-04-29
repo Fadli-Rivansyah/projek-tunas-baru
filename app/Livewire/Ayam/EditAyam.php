@@ -5,6 +5,8 @@ namespace App\Livewire\Ayam;
 use Livewire\Component;
 use App\Models\Ayam;
 use App\Models\Kandang;
+use Livewire\Attributes\Title;
+
 
 class EditAyam extends Component
 {
@@ -15,19 +17,23 @@ class EditAyam extends Component
     {
         // user relation
         $user = auth()->user();
-        $kandang = $user->kandang;
-        $this->kandang = $kandang;
+        $this->kandang = $user->kandang;
 
-        $ayam = Ayam::findOrFail($id);
-        $this->ayam = $ayam;
+        $this->ayam = Ayam::where('kandang_id', $this->kandang->id)
+        ->findOrFail($id);
 
         // tampilkan ke form input
-        $this->jumlahAyam_mati = $ayam->jumlah_ayam_mati;
-        $this->pakan = $ayam->jumlah_pakan;
-        $this->tanggal = $ayam->tanggal;
+        $this->jumlahAyam_mati = $this->ayam->jumlah_ayam_mati;
+        $this->pakan = $this->ayam->jumlah_pakan;
+        $this->tanggal = $this->ayam->tanggal;
 
-        $ayamMati = Ayam::where('kandang_id', $kandang?->id)->sum('jumlah_ayam_mati');
-        $this->total_ayam = $kandang?->jumlah_ayam - $ayamMati;
+        $this->hitungTotalAyam();
+    }
+
+    private function hitungTotalAyam()
+    {
+        $ayamMati = Ayam::where('kandang_id', $this->kandang->id)->sum('jumlah_ayam_mati');
+        $this->total_ayam = $this->kandang->jumlah_ayam - $ayamMati;
     }
 
     public function editAyam(){
@@ -53,10 +59,10 @@ class EditAyam extends Component
             'tanggal' => $this->tanggal,
         ]);
 
-        $this->reset();
         return redirect()->route('ayam')->with('success', 'Data kandang berhasil diubah.');
     }
 
+    #[Title('Edit Ayam')] 
     public function render()
     {
         return view('livewire.ayam.edit-ayam')->layout('layouts.app');;

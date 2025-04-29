@@ -7,6 +7,8 @@ use App\Models\Ayam;
 use App\Models\Kandang;
 use App\Models\Pakan;
 use Carbon\Carbon;
+use Livewire\Attributes\Title;
+
 
 class CreateAyam extends Component
 {
@@ -43,6 +45,7 @@ class CreateAyam extends Component
 
         $pakan->decrement('jumlah_jagung', $this->pakan/2);
         $pakan->decrement('jumlah_multivitamin', $this->pakan/2);
+        $pakan->decrement('sisa_pakan', $this->pakan);
 
         if ($pakan->jumlah_jagung < $this->pakan || $pakan->jumlah_multivitamin < $this->pakan) 
         {
@@ -50,28 +53,22 @@ class CreateAyam extends Component
             return;
         }
 
-        $tanggalSekarang = Carbon::today();
-
-        // $ayam = Ayam::where('kandang_id', $this->kandang->id)
-        //     ->where('tanggal', '<', $tanggalSekarang)
-        //     ->orderBy('tanggal', 'desc')
-        //     ->first();
-
-            Ayam::create([
+        Ayam::create([
             'user_id' => auth()->user()->id,
-            'kandang_id' =>$this->kandang->id,
+            'kandang_id' =>$this->kandang?->id,
             'total_ayam' => $this->total_ayam,
             'jumlah_ayam_mati' => $this->jumlahAyam_mati,
             'jumlah_pakan' => $this->pakan,
             'tanggal' => $this->tanggal,
         ]);
 
-        $this->reset();
         return redirect()->route('ayam')->with('success', 'Data ayam berhasil dibuat.');
     }
 
+    #[Title('Buat Data Ayam')] 
     public function render()
     {
         return view('livewire.ayam.create-ayam')->layout('layouts.app');
     }
 }
+ 

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Document</title>
+    <title>Laporan hasil telur</title>
     <style>
         .flex-items-center{
             witdh: 100%;
@@ -48,18 +48,18 @@
                 </td>
             </tr>
         </table>
-        
         <hr style="border: 2px solid black;">
         <div class="my-2">
-            <p>Laporan data ayam pada kandang <strong>{{ $nameChickenCoop }}</strong> bulan <strong>{{ $bulan }} {{ $tahun }}</strong>.</p>
+            <p>Laporan data ayam pada bulan <strong>{{ $bulan }} {{ $tahun }}</strong>.</p>
             <table class="table">
                 <thead>
                   <tr>
                     <th scope="col">No.</th>
-                    <th scope="col">Total Ayam (Sebelumnya)</th>
-                    <th scope="col">Ayam Mati (Sekarang)</th>
-                    <th scope="col">Jumlah Pakan</th>
-                    <th scope="col">Tanggal</th>
+                    <th scope="col">Nama Karyawan</th>
+                    <th scope="col">Nama Kandang</th>
+                    <th scope="col">Total Ayam</th>
+                    <th scope="col">Ayam Mati</th>
+                    <th scope="col">Produksi Telur</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -67,10 +67,11 @@
                     @foreach ($data as $item)
                         <tr>
                             <td>{{ $loop->iteration }}.</td>
-                            <td>{{ number_format($item->total_ayam , 0, ',', '.') }} Ekor</td>
-                            <td>{{number_format($item->jumlah_ayam_mati , 0, ',', '.')}} Ekor</td>
-                            <td>{{$item->jumlah_pakan}} Kg</td>
-                            <td>{{\Carbon\Carbon::parse($item->tanggal)->format('d-F-Y')}}</td>
+                            <td>{{ $item['name'] }}</td>
+                            <td>{{ $item['chickenCoop'] }}</td>
+                            <td>{{ number_format($item['totalChicken'], 0, ',', '.') }} Butir</td>
+                            <td>{{number_format($item['deadChicken'] , 0, ',', '.')}} Butir</td>
+                            <td>{{number_format($item['eggs'] , 0, ',', '.')}} Butir</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -78,7 +79,7 @@
         </div>
         {{-- section kesimpulan --}}
         <div class="section_kesimpulan">
-            <p style="line-height:30px;">Total Ayam masih hidup berjumlah <strong>{{ $liveChickens }} Ekor</strong>, ayam sudah mati berjumlah <strong>{{ $deadChickens }} Ekor</strong>, dan jumlah pakan keseluruhannya <strong>{{ $feedChickens }} Kg</strong>.</p>
+            <p style="line-height:30px;">Total ayam keseluruhan berjumlah <strong>{{ $totalChickens }} ekor</strong>, total ayam mati berjumah <strong>{{ $deadChickens }} ekor</strong>, dan total produksi telur berjumlah <strong>{{ $totalEggs }} Butir</strong>.</p>
         </div>
     </div>
 </body>

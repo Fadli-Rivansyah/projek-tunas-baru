@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('pakans', function (Blueprint $table) {
             $table->id();
+            $table->integer('total_pakan')->nullable();
             $table->integer('jumlah_jagung');
             $table->integer('jumlah_multivitamin');
+            $table->integer('sisa_pakan')->nullable();
             $table->date('tanggal');
             $table->timestamps();
         });

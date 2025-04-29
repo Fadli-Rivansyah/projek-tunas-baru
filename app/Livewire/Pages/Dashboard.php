@@ -3,6 +3,9 @@
 namespace App\Livewire\Pages;
 
 use Livewire\Attributes\Title;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\Ayam;
@@ -22,9 +25,7 @@ class Dashboard extends Component
     {
         // ambil user (karyawan)
         $user = auth()->user();
-        $kandang = $user->kandang;
-        $this->kandang = $kandang;
-
+        $this->kandang = $user->kandang;
         // view date
         $this->bulan = now()->format('m');
         $this->tahun = now()->format('Y');
@@ -33,16 +34,21 @@ class Dashboard extends Component
         $this->end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
 
         // jumlah ayam awal  karyawan
-        $ayamAwal = $kandang?->jumlah_ayam;
-        $ayamMati = Ayam::where('kandang_id', $kandang?->id)->sum('jumlah_ayam_mati');
+        $ayamAwal = $this->kandang?->jumlah_ayam;
+        $ayamMati = Ayam::where('kandang_id', $this->kandang?->id)->sum('jumlah_ayam_mati');
         $this->totalAyam = $ayamAwal - $ayamMati;
+
+        // $this->totalAyam = Cache::remember($cacheKey, $cacheDuration, function() use ($kandangId) {
+        //     $ayamAwal = $this->kandang->jumlah_ayam;
+        //     $ayamMati = Ayam::where('kandang_id', $kandangId)->sum('jumlah_ayam_mati');
+            
+        //     return $ayamAwal - $ayamMati;
+        // });
         
         // menghitung presentase
         $ayamMatiMinggu = $this->getHitungPersentaseAyamMati();
         // Hitung persentase dari ayam awal
-        $this->ayamMatiMinggu = $ayamAwal > 0
-        ? round(($ayamMatiMinggu / $ayamAwal) * 100, 2)
-        : 0;
+        $this->ayamMatiMinggu = $ayamAwal > 0 ? round(($ayamMatiMinggu / $ayamAwal) * 100, 2) : 0;
 
         // daftarkan method
         $this->hasil = $this->getHasilPersentaseTelur();
@@ -61,10 +67,14 @@ class Dashboard extends Component
         $this->getSummaryEmployeesProperty();
     }
 
+    // count all eggs
     public function getAllEggsProperty()
     {
-        $eggs = Telur::all()->whereBetween('tanggal', [$this->start, $this->end]);
+        // get all the eggs
+        $eggs = Telur::whereBetween('tanggal', [$this->start, $this->end])->get();
+        // count all the cracked eggs
         $crackedEggs = $eggs->sum('jumlah_telur_retak');
+        // count all the good eggs
         $goodEggs = $eggs->sum('jumlah_telur_bagus');
 
         return [
@@ -74,6 +84,7 @@ class Dashboard extends Component
         ];  
     }
 
+    // count all monthly eggs
     public function getAllMonthlyEggsProperty()
     {
         $queryGoodEgg = Telur::selectRaw('MONTH(tanggal) as bulan, SUM(jumlah_telur_bagus) as total')
@@ -161,6 +172,7 @@ class Dashboard extends Component
         ];
     }
 
+    // count presentase the eggs
     public function getHasilPersentaseTelur()
     {
         $latestTanggal = Telur::orderByDesc('tanggal')->value('tanggal');
@@ -203,21 +215,27 @@ class Dashboard extends Component
         ];
     }
 
+    // count all chicken like deadChicken and livechicken
     public function getAllChickensProperty()
     {
-        $totalChickens = Ayam::whereHas('kandang.user', function ($query) {
-            $query->where('is_admin', false); // hanya user yang bukan admin
-            $query->whereBetween('tanggal', [$this->start, $this->end]);
-        });
+        $totalDeadChickens = Ayam::whereBetween('created_at', [$this->start, $this->end])
+        ->whereHas('kandang.user', function ($query) {
+            $query->where('is_admin', false);
+        })->sum('jumlah_ayam_mati');
 
-        $firstChickens = Kandang::all()->sum('jumlah_ayam') - $totalChickens->sum('jumlah_ayam_mati');
+        $firstChickens = Kandang::whereHas('user', function ($query) {
+            $query->where('is_admin', false);
+        })->sum('jumlah_ayam');
+
+        $liveChickens = $firstChickens - $totalDeadChickens;
 
        return [
-            'deadChickens' => $totalChickens->sum('jumlah_ayam_mati'),
-            'liveChickens' => $firstChickens,
+            'deadChickens' => $totalDeadChickens,
+            'liveChickens' => $liveChickens,
        ];
     }
 
+    // count presentase dead chicken
     public function getHitungPersentaseAyamMati()
     {
         // Ambil data 7 hari terakhir
@@ -228,6 +246,7 @@ class Dashboard extends Component
             ->sum('jumlah_ayam_mati') ?? 0;
     }
 
+    // count all the feed
     public function getFeedAmountProperty()
     {
         $stock = Pakan::all();
@@ -247,16 +266,19 @@ class Dashboard extends Component
         ];
     }
 
+    // count all the employee
     public function getAllEmployeesProperty()
     {
         return User::where('is_admin', false)->count();
     }
 
+    //count all the chickens coops
      public function getAllChickenCoopsProperty()
     {
         return Kandang::all()->count();
     }
 
+    // summary employee
     public function getSummaryEmployeesProperty()
     {
         $users = User::where('is_admin', false)
@@ -267,40 +289,94 @@ class Dashboard extends Component
 
         foreach ($users as $user) {
             $kandang = $user->kandang;
-            $ayamMati =  $kandang?->ayam
-                ->where('kandang_id', $kandang->id)
-                ->sum('jumlah_ayam_mati') ?? 0;
+            $ayamMati = 0;
+            if ($kandang && $kandang->ayam) {
+                $ayamMati = $kandang->ayam
+                    ->where('kandang_id', $kandang->id)
+                    ->sum('jumlah_ayam_mati');
+            }
 
             $totalAyam = $kandang?->jumlah_ayam - $ayamMati ?? 0;
            
-            $eggs = $kandang && $kandang->telur
-                ? $kandang?->telur
+            $eggs = 0;
+            if ($kandang && $kandang->telur) {
+                $eggs = $kandang->telur
                     ->where('kandang_id', $kandang->id)
-                    ->sum('jumlah_telur_bagus') : 0;
-            
+                    ->sum('jumlah_telur_bagus');
+            }
+                    
             $data[] = [
-                    'name' => $kandang->nama_karyawan,
-                    'chickenCoop' => $kandang->nama_kandang ?? '-',
-                    'totalChicken' => $totalAyam,
+                    'name' => $kandang?->nama_karyawan ?? '-',
+                    'chickenCoop' => $kandang?->nama_kandang ?? '-',
+                    'totalChicken' => $totalAyam ?? 0,
                     'deadChicken' => $ayamMati,
                     'eggs' => $eggs,
                 ];
             }
 
-        return $data;
-}
+         // Ubah array $data menjadi paginator
+        $page = request()->get('page', 1); // ambil halaman dari URL
+        $perPage = 5;
+        $collection = new Collection($data);
+
+        $currentPageItems = $collection->slice(($page - 1) * $perPage, $perPage)->values();
+        return new LengthAwarePaginator(
+            $currentPageItems,
+            $collection->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+    }
+
+    // export pdf
+    public function exportPdf()
+    {
+        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
+        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
+
+        $data = $this->getSummaryEmployeesProperty();
+
+        $totalChickens = 0;
+        $deadChickens = 0;
+        $totalEggs = 0;
+
+        foreach ($data as $item) {
+            $totalChickens += $item['totalChicken'];
+            $deadChickens += $item['deadChicken'];
+            $totalEggs += $item['eggs'];
+        }
+
+        $bulan = nama_bulan($this->bulan);
+        $tahun = $this->tahun;
+        
+        $pdf = Pdf::loadView('report.export-pdf-admin', [
+            'data' => $data,
+            'bulan' => $bulan,
+            'tahun' => $tahun,
+            'totalChickens' =>number_format($totalChickens, 0, ',', '.'),
+            'deadChickens' => number_format($deadChickens, 0, ',', '.'),
+            'totalEggs' => number_format($totalEggs, 0, ',', '.'),
+        ]);
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, "laporan-summary-karyawan-{$bulan}-{$tahun}.pdf");
+    }
 
     #[Title('Dashboard')] 
     public function render()
     {
         return view('livewire.pages.dashboard', [
+            'nameChickensCoop' => auth()->user()->kandang?->nama_kandang ?? '-',
+            'totalChicken' =>  number_format($this->totalAyam, 0, ',', '.'),
             'totalEmployees' => $this->allEmployees,
             'totalChickenCoops' => $this->allChickenCoops,
             'totalEggs' => number_format($this->allEggs['totalEggs'], 0, ',', '.'),
             'goodEggs' => $this->allMonthlyEggs['goodEggs'],
             'crackedEggs' => $this->allMonthlyEggs['crackedEggs'],
-            'deadChickens' => number_format($this->allChickens['deadChickens'], 0, ',', '.'),
-            'liveChickens' => number_format($this->allChickens['liveChickens'], 0, ',', '.'),
+            'deadChickens' => $this->allChickens['deadChickens'],
+            'liveChickens' => $this->allChickens['liveChickens'],
             'feed' => $this->feedAmount,
         ])->layout('layouts.app');
     }

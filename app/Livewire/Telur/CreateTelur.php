@@ -5,6 +5,7 @@ namespace App\Livewire\Telur;
 use Livewire\Component;
 use App\Models\Telur;
 use App\Models\Kandang;
+use Livewire\Attributes\Title;
 
 class CreateTelur extends Component
 {
@@ -39,6 +40,7 @@ class CreateTelur extends Component
         return redirect()->route('telur')->with('success', 'Data telur berhasil dibuat.');
     }
     
+    #[Title('Buat Telur')] 
     public function render()
     {
         return view('livewire.telur.create-telur')->layout('layouts.app');

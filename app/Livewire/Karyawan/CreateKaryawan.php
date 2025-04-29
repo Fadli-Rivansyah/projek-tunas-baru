@@ -5,6 +5,7 @@ namespace App\Livewire\Karyawan;
 use Livewire\Component;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Livewire\Attributes\Title;
 
 class CreateKaryawan extends Component
 {
@@ -28,6 +29,7 @@ class CreateKaryawan extends Component
         return redirect()->route('karyawan')->with('success', 'Data karyawan berhasil ditambahkan.');
     }
 
+    #[Title('Buat Karyawan')] 
     public function render()
     {
         return view('livewire.karyawan.create-karyawan')->layout('layouts.app');

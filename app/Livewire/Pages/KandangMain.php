@@ -5,6 +5,7 @@ namespace App\Livewire\Pages;
 use Livewire\Component;
 use App\Livewire\Pages\KandangMain;
 use App\Models\Kandang;
+use Livewire\Attributes\Title;
 
 class KandangMain extends Component
 {
@@ -22,6 +23,7 @@ class KandangMain extends Component
         return redirect()->route('kandang')->with('success', 'Data kandang berhasil dihapus.');
     }
 
+    #[Title('Buat Data Kandang')] 
     public function render()
     {
         $kandang = Kandang::where('user_id', auth()->id())->first();

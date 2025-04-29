@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Document</title>
+    <title>Lapaoran karyawan</title>
     <style>
         .flex-items-center{
             witdh: 100%;
@@ -51,13 +51,15 @@
         
         <hr style="border: 2px solid black;">
         <div class="my-2">
-            <p>Laporan data ayam pada kandang <strong>{{ $nameChickenCoop }}</strong> bulan <strong>{{ $bulan }} {{ $tahun }}</strong>.</p>
+            <p>Laporan karyawan pada kandang {{ $totalChickenCoops}} bulan <strong>{{ $bulan }} {{ $tahun }}</strong>.</p>
             <table class="table">
                 <thead>
                   <tr>
                     <th scope="col">No.</th>
-                    <th scope="col">Total Ayam (Sebelumnya)</th>
-                    <th scope="col">Ayam Mati (Sekarang)</th>
+                    <th scope="col">Total Ayam Sebelumnya</th>
+                    <th scope="col">Ayam Mati</th>
+                    <th scope="col">Produksi Telur</th>
+                    <th scope="col">Telur Retak</th>
                     <th scope="col">Jumlah Pakan</th>
                     <th scope="col">Tanggal</th>
                   </tr>
@@ -67,10 +69,12 @@
                     @foreach ($data as $item)
                         <tr>
                             <td>{{ $loop->iteration }}.</td>
-                            <td>{{ number_format($item->total_ayam , 0, ',', '.') }} Ekor</td>
-                            <td>{{number_format($item->jumlah_ayam_mati , 0, ',', '.')}} Ekor</td>
-                            <td>{{$item->jumlah_pakan}} Kg</td>
-                            <td>{{\Carbon\Carbon::parse($item->tanggal)->format('d-F-Y')}}</td>
+                            <td>{{number_format($item['liveChickens'], 0, ',', '.') ?? 0}}</td>
+                            <td>{{number_format($item['deadChickens'], 0, ',', '.') ?? 0}}</td>
+                            <td>{{ number_format($item['productionEggs'], 0, ',', '.') ?? 0 }}</td>
+                            <td>{{ number_format($item['crackedEggs'], 0, ',', '.') ?? 0 }}</td>
+                            <td>{{ number_format($item['feedChickens'], 0, ',', '.') ?? 0 }}</td>
+                            <td>{{ $item['tanggal'] ??0  }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -78,7 +82,7 @@
         </div>
         {{-- section kesimpulan --}}
         <div class="section_kesimpulan">
-            <p style="line-height:30px;">Total Ayam masih hidup berjumlah <strong>{{ $liveChickens }} Ekor</strong>, ayam sudah mati berjumlah <strong>{{ $deadChickens }} Ekor</strong>, dan jumlah pakan keseluruhannya <strong>{{ $feedChickens }} Kg</strong>.</p>
+            <p style="line-height:30px;">Total Ayam saat ini berjumlah <strong>{{ $liveChickens }} ekor</strong>, ayam mati berjumlah <strong>{{ $deadChickens }} ekor</strong>, total produksi telur berjumlah <strong>{{ $totalEggs }} Butir</strong>, dan telur retak <strong>{{ $crackedEggs }} Butir</strong>.</p>
         </div>
     </div>
 </body>

@@ -13,6 +13,7 @@ class EditPakan extends Component
     public function mount($id)
     {
         $pakan = Pakan::findOrFail($id);
+
         $this->jagung = $pakan->jumlah_jagung;
         $this->multivitamin = $pakan->jumlah_multivitamin;
         $this->tanggal = $pakan->tanggal;
@@ -34,11 +35,14 @@ class EditPakan extends Component
             'tanggal.required' => 'Tanggal harus diisi',
         ]);
 
+        $totalFeed = $this->jagung + $this->multivitamin;
         // update
         $pakan = Pakan::findOrFail($this->pakan_id);
         $pakan->update([
+            'total_pakan' => $totalFeed,
             'jumlah_jagung' => $this->jagung,
             'jumlah_multivitamin' => $this->multivitamin,
+            'sisa_pakan' => $totalFeed,
             'tanggal' => $this->tanggal,
         ]);
 

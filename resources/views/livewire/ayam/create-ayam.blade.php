@@ -29,7 +29,7 @@
                         @error('tanggal') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                 </div>
-                <button type="submit" class="text-white bg-yellow-500 hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ">Simpan</button>
+                <button type="submit" aria-label="btn submit" class="text-white bg-yellow-500 hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ">Simpan</button>
             </form>
         </div>
     </div>
