@@ -28,15 +28,16 @@ class TelurMain extends Component
     
     public function getJumlahTelurProperty()
     {
-        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
-        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
-
         // menghitung perbulan
-        $telur = Telur::where('kandang_id', $this->kandang?->id)
-            ->whereBetween('tanggal', [$start, $end]);
+        $telur = Cache::remember("kandang_{$this->kandang->id}_eggs", 300, function() {
+            $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
+            $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
+            
+            return telurwhere('kandang_id', $this->kandang?->id)
+               ->whereBetween('tanggal', [$start, $end]);
+        });
 
         // menghitung telur keseluruhan
-        $totalEggs = Telur::where('kandang_id', $this->kandang?->id);
         $totalEggs = $totalEggs->sum('jumlah_telur_bagus') + $totalEggs->sum('jumlah_telur_retak');
         
         return [

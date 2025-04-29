@@ -10,6 +10,8 @@ use Carbon\Carbon;
 use App\Charts\MonthlyAyamChart;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Cache;
+
 
 class AyamMain extends Component
 {
@@ -31,13 +33,32 @@ class AyamMain extends Component
         if($this->kandang){
             // temukan jumlah ayam
             $ayamAwal = $this->kandang?->jumlah_ayam;
-            $ayamMati = Ayam::where('kandang_id', $this->kandang?->id)->sum('jumlah_ayam_mati');
-            $this->totalAyam = $ayamAwal - $ayamMati;
+            // Cache ayam mati
+            $ayamMati = Cache::remember(
+                "kandang_{$this->kandang->id}_mati",
+                300,
+                fn () => Ayam::where('kandang_id', $this->kandang->id)->sum('jumlah_ayam_mati')
+            );
+
+            // Cache total ayam hidup
+            $totalAyam = Cache::remember(
+                "kandang_{$this->kandang->id}_total",
+                300,
+                fn () => $this->kandang->jumlah_ayam - $ayamMati
+            );
+
+            $this->totalAyam = $totalAyam;
             $this->totalMati = $ayamMati;
+
             // chicken age
-            $usiaAyam = $this->kandang?->created_at;
-            $rentangMinggu = Carbon::parse($usiaAyam)->diffInWeeks(now());
-            $this->chickenAge = round($rentangMinggu) + $this->kandang?->umur_ayam;
+            $this->chickenAge = Cache::remember("kandang_{$this->kandang->id}_Age_chicken", 300, function() {
+                $baseAge = $this->kandang?->umur_ayam ?? 0;
+                if(!$this->kandang?->created_at){
+                    return $baseAge;
+                }
+                $weekRange = Carbon::parse($this->kandang?->created_at)->diffInWeeks(now());
+                return round($weekRange) + $baseAge ;
+            });
         }
         // tampilkan detail pakan
         $this->pakan = cache()->remember('detail_pakan', 60, function() {
@@ -75,7 +96,6 @@ class AyamMain extends Component
             ->paginate(10);
     }
 
-
     public function destroy($id)
     {
         $ayam= Ayam::findOrFail($id);
@@ -86,14 +106,16 @@ class AyamMain extends Component
 
     public function exportPdf()
     {
-        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
-        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
+        $data = Cache::remember("kandang_{$this->kandang->id}_export_chicken", 300, function() {
+            $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
+            $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
 
-        $data = Ayam::with('kandang')
-            ->where('kandang_id', $this->kandang->id)
-            ->whereBetween('tanggal', [$start, $end])
-            ->limit(500) 
-            ->get();
+            return Ayam::with('kandang')
+               ->where('kandang_id', $this->kandang->id)
+               ->whereBetween('tanggal', [$start, $end])
+               ->limit(50) 
+               ->get();
+        });
 
         $bulan = nama_bulan($this->bulan);
         $tahun = $this->tahun;
