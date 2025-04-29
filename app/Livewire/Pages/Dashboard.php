@@ -13,6 +13,8 @@ use App\Models\Telur;
 use App\Models\Kandang;
 use App\Models\Pakan;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
+
 
 class Dashboard extends Component
 {
@@ -33,17 +35,24 @@ class Dashboard extends Component
         $this->start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
         $this->end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
 
-        // jumlah ayam awal  karyawan
-        $ayamAwal = $this->kandang?->jumlah_ayam;
-        $ayamMati = Ayam::where('kandang_id', $this->kandang?->id)->sum('jumlah_ayam_mati');
-        $this->totalAyam = $ayamAwal - $ayamMati;
-
-        // $this->totalAyam = Cache::remember($cacheKey, $cacheDuration, function() use ($kandangId) {
-        //     $ayamAwal = $this->kandang->jumlah_ayam;
-        //     $ayamMati = Ayam::where('kandang_id', $kandangId)->sum('jumlah_ayam_mati');
-            
-        //     return $ayamAwal - $ayamMati;
-        // });
+        if($this->kandang){
+            // temukan jumlah ayam
+            $ayamAwal = $this->kandang?->jumlah_ayam;
+            // Cache total ayam hidup
+            $this->totalAyam = Cache::remember("kandang_{$this->kandang->id}_total_chicken_dashboard", 300, function () {
+                $deadChicken = Ayam::where('kandang_id', $this->kandang->id)->sum('jumlah_ayam_mati');
+                return $this->kandang->jumlah_ayam - $deadChicken;
+            });
+            // chicken age
+            $this->chickenAge = Cache::remember("kandang_{$this->kandang->id}_Age_chicken", 300, function() {
+                $baseAge = $this->kandang?->umur_ayam ?? 0;
+                if(!$this->kandang?->created_at){
+                    return $baseAge;
+                }
+                $weekRange = Carbon::parse($this->kandang?->created_at)->diffInWeeks(now());
+                return round($weekRange) + $baseAge ;
+            });
+        }
         
         // menghitung presentase
         $ayamMatiMinggu = $this->getHitungPersentaseAyamMati();

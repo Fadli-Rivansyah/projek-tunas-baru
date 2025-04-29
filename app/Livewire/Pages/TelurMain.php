@@ -7,6 +7,7 @@ use App\Models\Telur;
 use Carbon\Carbon;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Cache;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class TelurMain extends Component
@@ -29,21 +30,19 @@ class TelurMain extends Component
     public function getJumlahTelurProperty()
     {
         // menghitung perbulan
-        $telur = Cache::remember("kandang_{$this->kandang->id}_eggs", 300, function() {
+        $eggs = Cache::remember("kandang_{$this->kandang->id}_export_eggs", 300, function() {
             $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
             $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
             
-            return telurwhere('kandang_id', $this->kandang?->id)
-               ->whereBetween('tanggal', [$start, $end]);
+            return Telur::where('kandang_id', $this->kandang?->id)
+               ->whereBetween('tanggal', [$start, $end])->get();
         });
-
         // menghitung telur keseluruhan
-        $totalEggs = $totalEggs->sum('jumlah_telur_bagus') + $totalEggs->sum('jumlah_telur_retak');
-        
+        $totalEggs = $eggs->sum('jumlah_telur_bagus') + $eggs->sum('jumlah_telur_retak');
         return [
             'totalEggs' => number_format($totalEggs, 0, ',', '.'),
-            'telurBagus' => $telur->sum('jumlah_telur_bagus') ?? 0,
-            'telurRetak' => $telur->sum('jumlah_telur_retak') ?? 0
+            'telurBagus' => $eggs->sum('jumlah_telur_bagus') ?? 0,
+            'telurRetak' => $eggs->sum('jumlah_telur_retak') ?? 0
         ];
     }
 
@@ -83,14 +82,16 @@ class TelurMain extends Component
 
     public function exportPdf()
     {
-        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
-        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
-
-        $data = Telur::with('kandang')
-            ->where('kandang_id', $this->kandang->id)
-            ->whereBetween('tanggal', [$start, $end])
-            ->limit(50)
-            ->get();
+        $data = Cache::remember("kandang_{$this->kandang->id}_export_eggs", 300, function() {
+            $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
+            $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
+            
+            return Telur::with('kandang')
+                ->where('kandang_id', $this->kandang->id)
+                ->whereBetween('tanggal', [$start, $end])
+                ->limit(50)
+                ->get();
+        });
 
         $bulan = nama_bulan($this->bulan);
         $tahun = $this->tahun;
@@ -100,7 +101,7 @@ class TelurMain extends Component
 
         $pdf = Pdf::loadView('livewire.telur.export-pdf', [
             'data' => $data,
-            'nameChickenCoop' => $data->first()?->kandang?->nama_kandang ?? '-',
+            'nameChickenCoop' => $this->kandang?->nama_kandang ?? '-',
             'goodEggs' => number_format($sumEggs , 0, ',', '.'),
             'crackedEggs' => number_format($crackedEggs , 0, ',', '.'),
             'bulan' => $bulan,

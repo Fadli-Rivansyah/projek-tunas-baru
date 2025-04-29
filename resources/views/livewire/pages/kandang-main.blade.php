@@ -21,6 +21,42 @@
                     Buat Kandang
                 </a>
             @endif
+            <div class="flex gap-x-3">
+                {{-- card total chicken --}}
+                <section class="bg-white w-64 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
+                    <div class="flex-col flex gap-y-2 text-gray-500 mb-3">
+                        <svg aria-hidden="true"  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-10 bg-gray-200 p-2 rounded-md">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                        </svg>
+                        <span class="font-bold">Total Ayam</span>
+                    </div>
+                    <div class="flex justify-between items-center gap-x-5">
+                        <span class="text-4xl font-extrabold">{{ number_format($totalChicken, 0, ',', '.') }} <span class="text-sm text-gray-500">Ekor</span></span>
+                    </div>
+                </section>
+                {{-- card total dead chicken --}}
+                <section class="bg-white w-64 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
+                    <div class="flex-col flex gap-y-2 text-gray-500 mb-3">
+                        <svg class="size-10 bg-gray-200 p-2 rounded-md" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.0001 13c0-.8883.4022-2.3826 1-3.27163M18.05 14c0 3.3137-2.6862 6-6 6-3.31366 0-5.99995-2.6863-5.99995-6S8.73634 4 12.05 4c3.3138 0 6 6.6863 6 10Z"/>
+                        </svg>
+                        <span class="font-bold">Produksi Telur</span>
+                    </div>
+                    <div class="flex justify-between items-center gap-x-5">
+                        <span class="text-4xl font-extrabold">{{ number_format($eggs, 0, ',', '.') }} <span class="text-sm text-gray-500">Butir</span></span>
+                    </div>
+                </section>
+                <section class="bg-white w-64 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
+                    <div class="flex-col flex gap-y-2 text-gray-500 mb-3">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-skull size-10 bg-gray-200 p-2 rounded-md"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 4c4.418 0 8 3.358 8 7.5c0 1.901 -.755 3.637 -2 4.96l0 2.54a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1v-2.54c-1.245 -1.322 -2 -3.058 -2 -4.96c0 -4.142 3.582 -7.5 8 -7.5z" /><path d="M10 17v3" /><path d="M14 17v3" /><path d="M9 11m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M15 11m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg>
+                        <span class="font-bold">Usia Ayam</span>
+                    </div>
+                    <div class="flex justify-between items-center gap-x-5">
+                        <span class="text-4xl font-extrabold">{{ number_format($chickenAge, 0, ',', '.') }} <span class="text-sm text-gray-500">Minggu</span></span>
+                    </div>
+                </section>
+                
+            </div>
             {{-- tabel --}}
             <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5">
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500 ">
