@@ -9,6 +9,7 @@ use Livewire\Attributes\Url;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Cache;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Helpers\CountEggs;
 
 class TelurMain extends Component
 {
@@ -30,15 +31,9 @@ class TelurMain extends Component
     public function getJumlahTelurProperty()
     {
         // menghitung perbulan
-        $eggs = Cache::remember("kandang_{$this->kandang->id}_export_eggs", 300, function() {
-            $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
-            $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
-            
-            return Telur::where('kandang_id', $this->kandang?->id)
-               ->whereBetween('tanggal', [$start, $end])->get();
-        });
+        $eggs = CountEggs::getMonthlyEggs($this->kandang->id, $this->tahun, $this->bulan);
         // menghitung telur keseluruhan
-        $totalEggs = $eggs->sum('jumlah_telur_bagus') + $eggs->sum('jumlah_telur_retak');
+        $totalEggs =  CountEggs::getTotalEggInTheCage($this->kandang->id, $this->tahun, $this->bulan);
         return [
             'totalEggs' => number_format($totalEggs, 0, ',', '.'),
             'telurBagus' => $eggs->sum('jumlah_telur_bagus') ?? 0,

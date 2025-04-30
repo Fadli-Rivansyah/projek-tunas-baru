@@ -10,6 +10,8 @@ use App\Models\Ayam;
 use Livewire\Attributes\Title;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use App\Helpers\CountEggs;
+use App\Helpers\CountChickens;
 
 class KandangMain extends Component
 {
@@ -17,31 +19,23 @@ class KandangMain extends Component
 
     public function mount()
     {
+        $this->bulan = now()->format('m');
+        $this->tahun = now()->format('Y');
+        
         $this->kandang = Cache::remember("kandang_user_karyawan",  300, function() {
             return Kandang::where('user_id', auth()->id())->first();
         });
 
         if($this->kandang){
+            $firstChickens = $this->kandang->jumlah_ayam ?? 0;
+            $kandangId = $this->kandang->id;
+            $firstChickensAge = $this->kandang->created_at ?? 0;
+            $baseAge = $this->kandang->umur_ayam ?? 0;
             // Cache total ayam hidup
-            $this->totalChicken = Cache::remember("kandang_{$this->kandang->id}_total_chicken_kandang", 300, function () {
-                $deadChicken = Ayam::where('kandang_id', $this->kandang->id)->sum('jumlah_ayam_mati');
-                return $this->kandang->jumlah_ayam - $deadChicken;
-            }) ?? 0;
-
-            $this->eggs = Cache::remember("kandang_{$this->kandang->id}_total_eggs_kandang", 300, function () {
-                $egg = Telur::where('kandang_id', $this->kandang->id);
-                return $egg->sum('jumlah_telur_bagus') + $egg->sum('jumlah_telur_retak');
-            }) ?? 0;
-
+            $this->totalChicken = CountChickens::getTotalLiveChicken($kandangId, $firstChickens);
+            $this->eggs = CountEggs::getTotalEggInTheCage($this->kandang->id, $this->tahun, $this->bulan);
             // chicken age
-            $this->chickenAge = Cache::remember("kandang_{$this->kandang->id}_total_chickenAge_kandang", 300, function() {
-                $baseAge = $this->kandang?->umur_ayam ?? 0;
-                if(!$this->kandang?->created_at){
-                    return $baseAge;
-                }
-                $weekRange = Carbon::parse($this->kandang?->created_at)->diffInWeeks(now());
-                return round($weekRange) + $baseAge ;
-            });
+            $this->chickenAge = CountChickens::getTotalChickensAge($kandangId, $firstChickensAge, $baseAge);
         }
     }
 
@@ -51,7 +45,7 @@ class KandangMain extends Component
         $ayam = $kandang->ayams;
         $telur = $kandang->telurs;
         $kandang->delete();
-        if($telur == null || $ayam== null){
+        if($telur == null || $ayam == null){
             $telur->delete();
             $ayam->delete();
         }

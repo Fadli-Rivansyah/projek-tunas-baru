@@ -14,11 +14,14 @@ use App\Models\Kandang;
 use App\Models\Pakan;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
+use App\Helpers\CountEggs;
+use App\Helpers\CountFeed;
+use App\Helpers\CountChickens;
 
 
 class Dashboard extends Component
 {
-    public $totalAyam, $ayamMatiMinggu, $kandang;
+    public $kandang;
     public $hasil;
     public $bulan,$tahun;
     public $start,$end;
@@ -34,30 +37,6 @@ class Dashboard extends Component
 
         $this->start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
         $this->end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
-
-        if($this->kandang){
-            // temukan jumlah ayam
-            $ayamAwal = $this->kandang?->jumlah_ayam;
-            // Cache total ayam hidup
-            $this->totalAyam = Cache::remember("kandang_{$this->kandang->id}_total_chicken_dashboard", 300, function () {
-                $deadChicken = Ayam::where('kandang_id', $this->kandang->id)->sum('jumlah_ayam_mati');
-                return $this->kandang->jumlah_ayam - $deadChicken;
-            });
-            // chicken age
-            $this->chickenAge = Cache::remember("kandang_{$this->kandang->id}_Age_chicken", 300, function() {
-                $baseAge = $this->kandang?->umur_ayam ?? 0;
-                if(!$this->kandang?->created_at){
-                    return $baseAge;
-                }
-                $weekRange = Carbon::parse($this->kandang?->created_at)->diffInWeeks(now());
-                return round($weekRange) + $baseAge ;
-            });
-        }
-        
-        // menghitung presentase
-        $ayamMatiMinggu = $this->getHitungPersentaseAyamMati();
-        // Hitung persentase dari ayam awal
-        $this->ayamMatiMinggu = $ayamAwal > 0 ? round(($ayamMatiMinggu / $ayamAwal) * 100, 2) : 0;
 
         // daftarkan method
         $this->hasil = $this->getHasilPersentaseTelur();
@@ -76,6 +55,125 @@ class Dashboard extends Component
         $this->getSummaryEmployeesProperty();
     }
 
+    /**
+     * ======== dashboard employee =========
+     */
+    public function getTableTelurProperty()
+    {
+        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
+        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
+
+        return Telur::where('kandang_id', $this->kandang?->id)
+            ->whereBetween('tanggal', [$start, $end])->paginate(5);
+    }
+
+    public function getMonthlyEggsProperty()
+    {
+        $queryEggsGood = Cache::remember("kandang_{$this->kandang?->id}_monthly_goodEggs_dashboard", 300, function() {
+                         return Telur::where('kandang_id', $this->kandang?->id)->whereYear('tanggal', now()->year)
+                                ->selectRaw('MONTH(tanggal) as bulan, SUM(jumlah_telur_bagus) as total')->groupBy('bulan')->orderBy('bulan')
+                                ->pluck('total', 'bulan');
+        });
+
+        $queryEggsCracked = Cache::remember("kandang_{$this->kandang?->id}_monthly_crakedEggs_dashboard", 300, function() {
+                        return Telur::where('kandang_id', $this->kandang?->id)->whereYear('tanggal', now()->year)
+                                ->selectRaw('MONTH(tanggal) as bulan, SUM(jumlah_telur_retak) as total')->groupBy('bulan')->orderBy('bulan')
+                                ->pluck('total', 'bulan');
+        });
+
+        $labels = [];
+        $goodEggs = [];
+        $crackedEggs = [];
+    
+        for ($i = 1; $i <= 12; $i++) {
+            $labels[] = \Carbon\Carbon::create()->month($i)->format('M');
+            $goodEggs[] = $queryEggsGood[$i] ?? 0;
+            $crackedEggs[] = $queryEggsCracked[$i] ?? 0;
+        }
+    
+        return [
+            'labels' => $labels,
+            'goodEggs' => $goodEggs,
+            'crackedEggs' => $crackedEggs,
+        ];
+    }
+
+    public function getCountChickensProperty()
+    {
+        $firstChickens = $this->kandang?->jumlah_ayam;
+        $kandangId = $this->kandang?->id;
+        $firstChickensAge = $this->kandang?->created_at;
+        $baseAge = $this->kandang?->umur_ayam ?? 0;
+        // cache
+        $totalChickens = CountChickens::getTotalLiveChicken($kandangId, $firstChickens);
+        $deadChickens = CountChickens::getTotalDeadChicken($kandangId);
+        $chickenAge = CountChickens::getTotalChickensAge($kandangId, $firstChickensAge, $baseAge);
+
+        return [
+            'totalChickensInCage' => $totalChickens,
+            'deadChickens' => $deadChickens, 
+            'chickenAge' => $chickenAge,
+        ];
+    }
+    // count presentase the eggs
+    public function getHasilPersentaseTelur()
+    {
+        $latestTanggal = Telur::orderByDesc('tanggal')->value('tanggal');
+        $latestDate = Carbon::parse($latestTanggal);
+
+        $startOfThisWeek = $latestDate->copy()->startOfWeek();
+        $endOfThisWeek = $latestDate->copy()->endOfWeek();
+        
+        $startOfLastWeek = $latestDate->copy()->subWeek()->startOfWeek();
+        $endOfLastWeek = $latestDate->copy()->subWeek()->endOfWeek();
+     
+        // minggu lalu
+        $telurMingguLalu = CountEggs::getLastWeekGoodEggs($this->kandang?->id, $startOfLastWeek,$endOfLastWeek);
+        // menghitung minggu ini
+        $telurMingguIni = CountEggs::getThisWeekGoodEggs($this->kandang?->id, $startOfThisWeek, $endOfThisWeek);
+
+
+        if ($telurMingguLalu > 0) {
+            $selisih = $telurMingguIni - $telurMingguLalu;
+            $persentase = round(($selisih / $telurMingguLalu) * 100, 2);
+            $naik = $selisih > 0;
+        }elseif($telurMingguIni === $telurMingguLalu){
+            $persentase = 0.00;
+            $naik = false;
+        }else{
+            $persentase = $telurMingguIni > 0 ? 100 : 0.00;
+            $naik = true;
+        }
+                
+        return [
+            'jumlah' => $telurMingguIni,
+            'persentase' => $persentase,
+            'naik' => $naik
+        ];
+    }
+    // count presentase dead chicken
+    public function getPersentaseDeadchickenProperty()
+    {
+        $firstChickens = $this->kandang?->jumlah_ayam;
+        // Ambil data 7 hari terakhir
+        $week = Carbon::now()->subDays(7);
+        $deadChickens = Cache::remember("kandang_{$this->kandang?->id}_count_persentase_chicken_dashboard", 300, function() use ($week) {
+            return Ayam::where('kandang_id', $this->kandang?->id)
+               ->where('created_at', '>=', $week)
+               ->sum('jumlah_ayam_mati') ?? 0;
+        });
+
+        return $firstChickens > 0 ? round(($deadChickens / $firstChickens) * 100, 2) : 0;
+    }
+
+     // count all the feed
+     public function getFeedAmountProperty()
+     {
+        return CountFeed::getTotalFeed();
+     }
+    /**
+     * ========== dashboard admin ===========
+     */
     // count all eggs
     public function getAllEggsProperty()
     {
@@ -122,158 +220,13 @@ class Dashboard extends Component
         ];
     }
 
-    public function getTableTelurProperty()
-    {
-        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
-        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
-
-        return Telur::where('kandang_id', $this->kandang?->id)
-            ->whereBetween('tanggal', [$start, $end])->paginate(5);
-    }
-
-    public function getTelurBulananProperty()
-    {
-        $queryTelurBagus = Telur::where('kandang_id', $this->kandang?->id)
-            ->whereYear('tanggal', now()->year) // filter berdasarkan tahun aktif (bisa diganti $this->tahun)
-            ->selectRaw('MONTH(tanggal) as bulan, SUM(jumlah_telur_bagus) as total')
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->pluck('total', 'bulan');
-        
-        $queryTelurRetak = Telur::where('kandang_id', $this->kandang?->id)
-            ->whereYear('tanggal', now()->year) // filter berdasarkan tahun aktif (bisa diganti $this->tahun)
-            ->selectRaw('MONTH(tanggal) as bulan, SUM(jumlah_telur_retak) as total')
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->pluck('total', 'bulan');
-    
-        $labels = [];
-        $telurBagus = [];
-        $telurRetak = [];
-    
-        for ($i = 1; $i <= 12; $i++) {
-            $labels[] = \Carbon\Carbon::create()->month($i)->format('M');
-            $telurBagus[] = $queryTelurBagus[$i] ?? 0;
-            $telurRetak[] = $queryTelurRetak[$i] ?? 0;
-        }
-    
-        return [
-            'labels' => $labels,
-            'telurBagus' => $telurBagus,
-            'telurRetak' => $telurRetak,
-        ];
-    }
-
-    public function getJumlahAyamProperty()
-    {
-        $ayamHidup = Ayam::where('kandang_id', $this->kandang?->id)->latest()->value('total_ayam');
-        $ayamMati = Ayam::where('kandang_id', $this->kandang?->id)->sum('jumlah_ayam_mati');
-        
-        // nama barak
-        $name = $this->kandang?->nama_kandang;
-        // hitung usia ayam
-        $usiaAyam = $this->kandang?->created_at;
-        $rentangMinggu = Carbon::parse($usiaAyam)->diffInWeeks(now());
-        $jumlahMinggu = round($rentangMinggu) + $this->kandang?->umur_ayam;
-
-        return [
-            'series' => [$ayamHidup, $ayamMati, $jumlahMinggu, $name],
-        ];
-    }
-
-    // count presentase the eggs
-    public function getHasilPersentaseTelur()
-    {
-        $latestTanggal = Telur::orderByDesc('tanggal')->value('tanggal');
-        $latestDate = Carbon::parse($latestTanggal);
-
-        $startOfThisWeek = $latestDate->copy()->startOfWeek();
-        $endOfThisWeek = $latestDate->copy()->endOfWeek();
-        
-        $startOfLastWeek = $latestDate->copy()->subWeek()->startOfWeek();
-        $endOfLastWeek = $latestDate->copy()->subWeek()->endOfWeek();
-     
-        // minggu lalu
-        $telurMingguLalu = Telur::where('kandang_id', $this->kandang?->id)
-            ->whereDate('tanggal', '>=', $startOfLastWeek)
-            ->whereDate('tanggal', '<=', $endOfLastWeek)
-            ->sum('jumlah_telur_bagus');
-
-        // menghitung minggu ini
-        $telurMingguIni = Telur::where('kandang_id', $this->kandang?->id)
-            ->whereDate('tanggal', '>=', $startOfThisWeek)
-            ->whereDate('tanggal', '<=', $endOfThisWeek)
-            ->sum('jumlah_telur_bagus');
-
-        if ($telurMingguLalu > 0) {
-            $selisih = $telurMingguIni - $telurMingguLalu;
-            $persentase = round(($selisih / $telurMingguLalu) * 100, 2);
-            $naik = $selisih > 0;
-        }elseif($telurMingguIni === $telurMingguLalu){
-            $persentase = 0.00;
-            $naik = false;
-        }else{
-            $persentase = $telurMingguIni > 0 ? 100 : 0.00;
-            $naik = true;
-        }
-
-        return [
-            'jumlah' => $telurMingguIni,
-            'persentase' => $persentase,
-            'naik' => $naik
-        ];
-    }
-
     // count all chicken like deadChicken and livechicken
     public function getAllChickensProperty()
     {
-        $totalDeadChickens = Ayam::whereBetween('created_at', [$this->start, $this->end])
-        ->whereHas('kandang.user', function ($query) {
-            $query->where('is_admin', false);
-        })->sum('jumlah_ayam_mati');
-
-        $firstChickens = Kandang::whereHas('user', function ($query) {
-            $query->where('is_admin', false);
-        })->sum('jumlah_ayam');
-
-        $liveChickens = $firstChickens - $totalDeadChickens;
-
-       return [
-            'deadChickens' => $totalDeadChickens,
-            'liveChickens' => $liveChickens,
-       ];
+        return CountChickens::getChickensInCage($this->start, $this->end);
     }
 
-    // count presentase dead chicken
-    public function getHitungPersentaseAyamMati()
-    {
-        // Ambil data 7 hari terakhir
-        $mingguLalu = Carbon::now()->subDays(7);
-
-        return Ayam::where('kandang_id', $this->kandang?->id)
-            ->where('created_at', '>=', $mingguLalu)
-            ->sum('jumlah_ayam_mati') ?? 0;
-    }
-
-    // count all the feed
-    public function getFeedAmountProperty()
-    {
-        $stock = Pakan::all();
-
-        $startOfMonth = Carbon::now()->startOfMonth();
-        $endOfMonth = Carbon::now()->endOfMonth();
-
-        $jagung = $stock->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
-        ->last()?->jumlah_jagung;
-
-        $multivitamin = $stock->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
-        ->last()?->jumlah_multivitamin;
-
-        return [
-            'jagung' => $jagung,
-            'multivitamin' => $multivitamin,
-        ];
-    }
+   
 
     // count all the employee
     public function getAllEmployeesProperty()
@@ -378,7 +331,7 @@ class Dashboard extends Component
     {
         return view('livewire.pages.dashboard', [
             'nameChickensCoop' => auth()->user()->kandang?->nama_kandang ?? '-',
-            'totalChicken' =>  number_format($this->totalAyam, 0, ',', '.'),
+            'totalChickens' =>  number_format($this->countChickens['totalChickensInCage'], 0, ',', '.'),
             'totalEmployees' => $this->allEmployees,
             'totalChickenCoops' => $this->allChickenCoops,
             'totalEggs' => number_format($this->allEggs['totalEggs'], 0, ',', '.'),

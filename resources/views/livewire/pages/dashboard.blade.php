@@ -35,12 +35,12 @@
                         </div>
                         <div class="flex justify-between items-center mb-2 gap-x-5">
                             <span class="text-4xl font-extrabold">
-                                {{ $totalChicken }} 
+                                {{ $totalChickens }} 
                                 <span class="text-gray-500 text-sm">Ekor</span>
                             </span>
                         </div>
                         <div class="bg-red-100 mb-1 w-max  text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full inline-flex items-center font-bold px-1 py-0.2 gap-1">
-                            <span class="text-xs"> ↓ {{ $ayamMatiMinggu }}%</span>
+                            <span class="text-xs"> ↓ {{ $this->persentaseDeadchicken }}%</span>
                         </div>
                         <span class="text-sm italic text-gray-500 float-end">Akhir minggu ini</span>
                     </section>
@@ -50,7 +50,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-10 bg-gray-200 p-2 rounded-md">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
                                 </svg>
-                            <span class="font-bold">Produksi Telur</span>
+                            <span class="font-bold">Produksi Telur Bagus</span>
                         </div>
                         <div class="flex flex-col flex-end gap-x-5">
                             <div class="flex justify-between items-center mb-2 gap-x-5">
@@ -116,13 +116,13 @@
                             },
                             series: [{
                                 name: 'Telur Bagus',
-                                data: @json($this->telurBulanan['telurBagus']),
+                                data: @json($this->monthlyEggs['goodEggs']),
                             },{
                                 name: 'Telur Retak',
-                                data: @json($this->telurBulanan['telurRetak']),
+                                data: @json($this->monthlyEggs['crackedEggs']),
                             }],
                             xaxis: {
-                                categories: @json($this->telurBulanan['labels']),
+                                categories: @json($this->monthlyEggs['labels']),
                             },
                             stroke: {
                                 curve: 'smooth'
@@ -155,7 +155,7 @@
                                         align: 'left'
                                     },
                                     labels: ['Ayam Hidup', 'Ayam Mati', 'Usia Ayam'],
-                                    series:[{{$this->jumlahAyam['series'][0]}}, {{$this->jumlahAyam['series'][1]}}, {{ $this->jumlahAyam['series'][2]}}],
+                                    series:[{{ $this->countChickens['totalChickensInCage'] }}, {{ $this->countChickens['deadChickens'] }}, {{ $this->countChickens['chickenAge'] }}],
                                     chart: {
                                         type: 'donut',
                                         height: 480,
@@ -269,6 +269,7 @@
                     </div>
                 </div>
             @endcannot
+
             {{-- dashbaord for admin --}}
             @can('admin')
             <div class="w-full flex flex-col">
@@ -351,7 +352,7 @@
                                     data: @json($crackedEggs),
                                 }],
                                 xaxis: {
-                                    categories: @json($this->telurBulanan['labels']),
+                                    categories:  @json($this->monthlyEggs['labels']),
                                 },
                                 stroke: {
                                     curve: 'smooth'

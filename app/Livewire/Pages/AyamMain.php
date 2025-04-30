@@ -8,6 +8,8 @@ use App\Models\Kandang;
 use App\Models\Pakan;
 use Carbon\Carbon;
 use App\Charts\MonthlyAyamChart;
+use App\Helpers\CountChickens;
+use App\Helpers\CountFeed;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Cache;
@@ -31,43 +33,16 @@ class AyamMain extends Component
         $this->kandang = $user->kandang;
       
         if($this->kandang){
-            // temukan jumlah ayam
-            $ayamAwal = $this->kandang?->jumlah_ayam;
-            // Cache ayam mati
-            $ayamMati = Cache::remember(
-                "kandang_{$this->kandang->id}_mati",
-                300,
-                fn () => Ayam::where('kandang_id', $this->kandang->id)->sum('jumlah_ayam_mati')
-            );
-
-            // Cache total ayam hidup
-            $totalAyam = Cache::remember(
-                "kandang_{$this->kandang->id}_total",
-                300,
-                fn () => $this->kandang->jumlah_ayam - $ayamMati
-            );
-
-            $this->totalAyam = $totalAyam;
-            $this->totalMati = $ayamMati;
-
-            // chicken age
-            $this->chickenAge = Cache::remember("kandang_{$this->kandang->id}_Age_chicken", 300, function() {
-                $baseAge = $this->kandang?->umur_ayam ?? 0;
-                if(!$this->kandang?->created_at){
-                    return $baseAge;
-                }
-                $weekRange = Carbon::parse($this->kandang?->created_at)->diffInWeeks(now());
-                return round($weekRange) + $baseAge ;
-            });
+            $firstChickens = $this->kandang?->jumlah_ayam;
+            $kandangId = $this->kandang?->id;
+            $firstChickensAge = $this->kandang?->created_at;
+            $baseAge = $this->kandang?->umur_ayam ?? 0;
+            // cache
+            $this->totalAyam = CountChickens::getTotalLiveChicken($kandangId, $firstChickens);
+            $this->totalMati = CountChickens::getTotalDeadChicken($kandangId);
+            $this->chickenAge = CountChickens::getTotalChickensAge($kandangId, $firstChickensAge, $baseAge);
+            $this->pakan = CountFeed::getTotalFeed();
         }
-        // tampilkan detail pakan
-        $this->pakan = cache()->remember('detail_pakan', 60, function() {
-            $pakan = Pakan::latest()->first();
-            return [
-                'jagung' => $pakan->jumlah_jagung ?? 0,
-                'multivitamin' => $pakan->jumlah_multivitamin ?? 0,
-            ];
-        });
     }
 
     // hook livewire 

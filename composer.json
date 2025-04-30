@@ -30,15 +30,16 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers/BulanHelper.php",
+            "app/Helpers/CountEggs.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
-        },
-        "files": [
-            "app/Helpers/BulanHelper.php"
-        ]
+        }
     },
     "scripts": {
         "post-autoload-dump": [
