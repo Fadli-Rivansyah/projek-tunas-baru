@@ -14,7 +14,7 @@
                 {{-- alert --}}
                 @include('livewire.layout.alert')
                 {{-- card --}}
-                <div class="flex space-x-3 mb-6">
+                <div class="flex space-x-3 mb-6 fade-up">
                     {{-- card good eggs --}}
                     <section class="bg-white w-64 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
                         <div class="flex-col flex gap-y-2 text-gray-500 mb-3">
@@ -23,33 +23,36 @@
                               </svg>
                             <span class="font-bold">Telur Bagus</span>
                         </div>
-                        <div class="flex justify-between items-center gap-x-5">
+                        <div class="flex justify-between items-center gap-x-5 mb-4">
                             <span class="text-4xl font-extrabold">{{ number_format($this->jumlahTelur['telurBagus'], 0, ',', '.') }} <span class="text-sm text-gray-500">Butir</span></span>
                         </div>
+                        <span class="w-max bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full  border border-green-400">Bulan ini</span>
                     </section>
                     {{-- card cracked eggs --}}
                     <section class="bg-white w-64 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
-                        <div class="flex-col flex gap-y-2 text-gray-500 mb-3">
+                        <div class="flex-col flex gap-y-2 text-gray-500 mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-10 bg-gray-200 p-2 rounded-md">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
                             </svg>
                             <span class="font-bold">Telur Retak</span>
                         </div>
-                        <div class="flex justify-between items-center gap-x-5">
+                        <div class="flex justify-between items-center gap-x-5 mb-4">
                             <span class="text-4xl font-extrabold">{{ number_format($this->jumlahTelur['telurRetak'], 0, ',', '.') }} <span class="text-sm text-gray-500">Butir</span></span>
                         </div>
+                        <span class="w-max bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full  border border-red-400">Bulan ini</span>
                     </section>
                     {{-- total eggs --}}
                     <section class="bg-white w-64 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
-                        <div class="flex-col flex gap-y-2 text-gray-500 mb-3">
+                        <div class="flex-col flex gap-y-2 text-gray-500 mb-2">
                             <svg class="size-10 bg-gray-200 p-2 rounded-md" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.0001 13c0-.8883.4022-2.3826 1-3.27163M18.05 14c0 3.3137-2.6862 6-6 6-3.31366 0-5.99995-2.6863-5.99995-6S8.73634 4 12.05 4c3.3138 0 6 6.6863 6 10Z"/>
                               </svg>
                             <span class="font-bold">Total Telur</span>
                         </div>
-                        <div class="flex justify-between items-center gap-x-5">
+                        <div class="flex justify-between items-center gap-x-5 mb-4">
                             <span class="text-4xl font-extrabold">{{ $totalEggs }} <span class="text-sm text-gray-500">Butir</span></span>
                         </div>
+                        <span class="bg-yellow-100 text-yellow-800 w-max text-xs font-medium me-2 px-2.5 py-0.5 rounded-full border border-yellow-300">Semua</span>
                     </section>
                     {{-- card chart --}}
                     <section>
@@ -82,7 +85,7 @@
                     </section>
                 </div>
                 {{-- section create --}}
-                <section class="flex items-center space-x-4 w-full">
+                <section class="flex items-center space-x-4 w-full fade-up">
                     {{-- btn create data egg --}}
                     <a  href="{{ route('telur.create') }}" aria-label="buat data telur" class="flex items-center gap-2 text-white bg-yellow-500 w-max hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-500 font-medium rounded-md text-sm px-5 py-2.5 text-center mb-2">
                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -90,18 +93,6 @@
                         </svg>
                         Create Data Telur
                     </a>
-                    {{-- fitur search --}}
-                    <div class="flex items-center max-w-xl">   
-                        <label for="simple-search" class="sr-only">Search</label>
-                        <div class="relative w-full">
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                <svg class="w-6 h-6 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
-                                </svg>                          
-                            </div>
-                            <input type="text" wire:model.live="search" id="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full ps-10 p-2.5 " placeholder="Cari dengan tanggal ..." required />
-                        </div>
-                    </div>
                     {{-- fitur filter --}}
                     <div>
                         <form class="max-w-sm mx-auto flex gap-x-3 ">
@@ -132,7 +123,7 @@
                     </button>
                 </section>
                 {{-- tabel --}}
-                <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5 mb-4">
+                <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5 mb-4 fade-up">
                     <table class="w-full text-sm text-left rtl:text-right text-gray-500 ">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-200 ">
                             <tr>
@@ -193,7 +184,7 @@
             </div>
         </div>
     @else
-    <div class="p-6 space-y-6">
+    <div class="p-6 space-y-6 fade-up">
         <p>Silakan buat terlebih dahulu nama kandang dan data ayam!</p>
         <div class="flex items-center gap-x-2">
             <a  href="{{ route('kandang.create') }}" aria-label="buat kandang" class="flex items-center gap-2 text-white bg-yellow-500 w-max hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-500 font-medium rounded-md text-sm px-5 py-2.5 text-center mb-2">

@@ -8,11 +8,11 @@ use App\Models\Kandang;
 use App\Models\Pakan;
 use Carbon\Carbon;
 use App\Charts\MonthlyAyamChart;
-use App\Helpers\CountChickens;
-use App\Helpers\CountFeed;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Cache;
+use App\Helpers\ChickensCache;
+use App\Helpers\FeedsCache;
 
 
 class AyamMain extends Component
@@ -38,37 +38,28 @@ class AyamMain extends Component
             $firstChickensAge = $this->kandang?->created_at;
             $baseAge = $this->kandang?->umur_ayam ?? 0;
             // cache
-            $this->totalAyam = CountChickens::getTotalLiveChicken($kandangId, $firstChickens);
-            $this->totalMati = CountChickens::getTotalDeadChicken($kandangId);
-            $this->chickenAge = CountChickens::getTotalChickensAge($kandangId, $firstChickensAge, $baseAge);
-            $this->pakan = CountFeed::getTotalFeed();
+            $this->totalAyam = ChickensCache::getTotalLiveChicken($kandangId, $firstChickens);
+            $this->totalMati = ChickensCache::getTotalDeadChicken($kandangId);
+            $this->chickenAge = ChickensCache::getTotalChickensAge($kandangId, $firstChickensAge, $baseAge);
+            $this->pakan = FeedsCache::getTotalFeeds();
         }
     }
 
     // hook livewire 
     public function updatedBulan()
     {
-        $this->getFindAyamProperty();
+        $this->getMonthlyChickensProperty();
     }
 
     public function updatedTahun()
     {
-        $this->getFindAyamProperty();
+        $this->getMonthlyChickensProperty();
     }
 
     // method view data filter, search
-    public function getFindAyamProperty()
+    public function getMonthlyChickensProperty()
     {
-        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
-        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
-      
-        return  Ayam::with('kandang')
-            ->where('kandang_id', $this->kandang->id)
-            ->whereBetween('tanggal', [$start, $end])
-            ->when($this->search, function ($query) {
-                $query->where('tanggal', 'like', '%' . $this->search . '%');
-            })
-            ->paginate(10);
+        return ChickensCache::getMonthlyChickens($this->kandang?->id, $this->tahun, $this->bulan);
     }
 
     public function destroy($id)
@@ -81,16 +72,7 @@ class AyamMain extends Component
 
     public function exportPdf()
     {
-        $data = Cache::remember("kandang_{$this->kandang->id}_export_chicken", 300, function() {
-            $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
-            $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
-
-            return Ayam::with('kandang')
-               ->where('kandang_id', $this->kandang->id)
-               ->whereBetween('tanggal', [$start, $end])
-               ->limit(50) 
-               ->get();
-        });
+        $data = $this->getMonthlyChickensProperty();
 
         $bulan = nama_bulan($this->bulan);
         $tahun = $this->tahun;

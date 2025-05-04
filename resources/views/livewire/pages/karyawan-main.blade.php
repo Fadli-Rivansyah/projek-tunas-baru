@@ -8,7 +8,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             @include('livewire.layout.alert')
             {{-- card --}}
-            <div class="flex space-x-3 mb-6">
+            <div class="flex space-x-3 mb-6 fade-up">
                 {{-- card  total employees --}}
                 <section class="bg-white w-64 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
                     <div class="flex-col flex gap-y-2 text-gray-500 mb-3">
@@ -17,9 +17,11 @@
                           </svg>
                         <span class="font-bold">Total Karyawan</span>
                     </div>
-                    <div class="flex justify-between items-center gap-x-5">
+                    <div class="flex justify-between items-center gap-x-5 mb-4">
                         <span class="text-4xl font-extrabold">{{ $totalEmployees }}<span class="text-sm text-gray-500"> Orang</span></span>
                     </div>
+                    <span class="w-max bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full  border border-green-400">Saat Ini</span>
+
                 </section>
                 {{-- card total name chickencoop --}}
                 <section class="bg-white w-64 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
@@ -29,13 +31,14 @@
                           </svg>
                         <span class="font-bold">Total Kandang</span>
                     </div>
-                    <div class="flex justify-between items-center gap-x-5">
+                    <div class="flex justify-between items-center gap-x-5 mb-4">
                         <span class="text-4xl font-extrabold">{{ $totalChickenCoops }} <span class="text-sm text-gray-500">Barak</span></span>
                     </div>
+                    <span class="w-max bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full  border border-green-400">Saat Ini</span>
                 </section>
             </div>
             {{-- btn create employee --}}
-            <section class="inline-flex items-center gap-x-4 w-full">
+            <section class="inline-flex items-center gap-x-4 w-full fade-up">
                 <a  href="{{ route('karyawan.create') }}" aria-label="btn buat karyawan" class="flex items-center gap-2 text-white bg-yellow-500 w-max hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-500 font-medium rounded-md text-sm px-5 py-2.5 text-center mb-2">
                     <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
@@ -84,7 +87,7 @@
                 </button>
             </section>
             {{-- section table --}}
-            <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5 mb-4">
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5 mb-4 fade-up">
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500 ">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-200 ">
                         <tr>

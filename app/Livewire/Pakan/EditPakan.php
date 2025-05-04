@@ -4,11 +4,14 @@ namespace App\Livewire\Pakan;
 
 use Livewire\Component;
 use App\Models\Pakan;
+use App\Helper\ForgetCache;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Title;
 
 class EditPakan extends Component
 {
     public $jagung, $multivitamin, $tanggal, $pakan_id;
+    public $bulan, $tahun;
 
     public function mount($id)
     {
@@ -18,6 +21,10 @@ class EditPakan extends Component
         $this->multivitamin = $pakan->jumlah_multivitamin;
         $this->tanggal = $pakan->tanggal;
         $this->pakan_id = $id;
+
+        // view date
+        $this->bulan = now()->format('m');
+        $this->tahun = now()->format('Y');
     }
 
     public function editPakan()
@@ -36,6 +43,8 @@ class EditPakan extends Component
         ]);
 
         $totalFeed = $this->jagung + $this->multivitamin;
+        // cache
+        ForgetCache::getForgetCacheFeeds($this->bulan, $this->tahun);
         // update
         $pakan = Pakan::findOrFail($this->pakan_id);
         $pakan->update([

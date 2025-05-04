@@ -22,6 +22,8 @@ class EditKaryawan extends Component
             'nama' => 'required|string|max:255',
             'email' => 'required|email',
         ]);
+        // forget to cache
+        ForgetCache::getForgetCacheEmployees($this->nama);
 
         $updateKaryawan = User::findOrFail($this->id_user);
         $updateKaryawan->update([

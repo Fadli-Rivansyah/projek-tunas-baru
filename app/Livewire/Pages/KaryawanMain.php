@@ -9,6 +9,8 @@ use Carbon\Carbon;
 use Livewire\Attributes\Title;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Cache;
+use App\Helpers\EmployeesCache;
+use App\Helpers\ChickensCache;
 
 class KaryawanMain extends Component
 {
@@ -18,13 +20,9 @@ class KaryawanMain extends Component
 
     public function mount()
     {
-        $this->user = Cache::remember('non_admin_users_count', 100, function() {
-            return User::where('is_admin', false)->count();
-        });
-        
-        $this->kandang = Cache::remember('kandangs_count', 100, function() {
-            return Kandang::count();
-        });
+        // cache
+        $this->user = EmployeesCache::getTotalEmployees();
+        $this->kandang = ChickensCache::getTotalChickenInCage();
         
         // show date this mount and this years
         $this->bulan = now()->format('m');
@@ -33,8 +31,12 @@ class KaryawanMain extends Component
     //show number of employees
     public function getSearchKaryawanProperty()
     {
+        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
+        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
+
         return User::with('kandang')
             ->where('is_admin', false)
+            ->whereBetween('created_at', [$start, $end])
             // based on input search
             ->when($this->search, function ($query) {
                 $query->where('id', 'like', '%' . $this->search . '%')
@@ -46,7 +48,7 @@ class KaryawanMain extends Component
     public function exportPdf()
     {
         // data from method getSearchKaryawanProperty();
-        $data = $this->getSearchKaryawanProperty();
+        $data = EmployeesCache::getEmployeesExport($this->tahun, $this->bulan);
         // helper month
         $bulan = nama_bulan($this->bulan);
         $tahun = $this->tahun;

@@ -6,10 +6,23 @@ use Livewire\Component;
 use App\Models\Telur;
 use App\Models\Kandang;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Cache;
+use App\Helpers\ForgetCache;
 
 class CreateTelur extends Component
 {
-    public  $jumlahTelur_bagus, $jumlahTelur_retak, $tanggal;
+    public  $jumlahTelur_bagus, $jumlahTelur_retak, $tanggal, $kandang;
+    public $bulan, $tahun;
+
+    public function mount()
+    {
+        // user relation
+        $user = auth()->user();
+        $this->kandang = $user->kandang;
+
+        $this->bulan = now()->format('m');
+        $this->tahun = now()->format('Y');
+    }
 
     public function save()
     {
@@ -25,6 +38,9 @@ class CreateTelur extends Component
             'jumlahTelur_retak.numeric' => 'Data harus berisi angka',
             'tanggal.required' => 'Tanggal harus diisi',
         ]);
+
+        // forget to cache
+        ForgetCache::getForgetCacheEggs($this->kandang?->id, $this->bulan, $this->tahun);
 
         $kandang = Kandang::findOrFail(auth()->user()->kandang?->id);
         // create

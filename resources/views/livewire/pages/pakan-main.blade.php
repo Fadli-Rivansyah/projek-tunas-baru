@@ -8,20 +8,20 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             {{-- alert --}}
             @include('livewire.layout.alert')
-            <div class="flex gap-x-3 mb-6">
+            <div class="flex gap-x-3 mb-6 fade-up">
                  {{-- card total feed --}}
-                 <section class="bg-white w-72 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
+                 <section class="bg-white w-72 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg ">
                     <div class="flex-col flex gap-y-2 text-gray-500 mb-3">
                         <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-bowl-spoon size-10 bg-gray-200 p-2 rounded-md"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 11h16a1 1 0 0 1 1 1v.5c0 1.5 -2.517 5.573 -4 6.5v1a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-1c-1.687 -1.054 -4 -5 -4 -6.5v-.5a1 1 0 0 1 1 -1z" /><path d="M8 7c1.657 0 3 -.895 3 -2s-1.343 -2 -3 -2s-3 .895 -3 2s1.343 2 3 2" /><path d="M11 5h9" /></svg>
                         <span class="font-bold">Total Pakan</span>
                     </div>
-                    <div class="flex justify-between items-center mb-2 gap-x-5">
+                    <div class="flex justify-between items-center mb-4 gap-x-5">
                         <span class="text-4xl font-extrabold">
                             {{ $totalFeed }}
                             <span class="text-gray-500 text-sm">Kg</span>
                         </span>
                     </div>
-                    <span class="text-sm italic text-gray-500 float-end">Bulan ini</span>
+                    <span class="bg-yellow-100 text-yellow-800 w-max text-xs font-medium me-2 px-2.5 py-0.5 rounded-full border border-yellow-300">Bulan Ini</span>
                 </section>
                 {{-- card total corn --}}
                 <section class="bg-white w-64 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
@@ -29,13 +29,13 @@
                         <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-seedling size-10 bg-gray-200 p-2 rounded-md"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 10a6 6 0 0 0 -6 -6h-3v2a6 6 0 0 0 6 6h3" /><path d="M12 14a6 6 0 0 1 6 -6h3v1a6 6 0 0 1 -6 6h-3" /><path d="M12 20l0 -10" /></svg>
                         <span class="font-bold">Jumlah Jagung</span>
                     </div>
-                    <div class="flex justify-between items-center mb-2 gap-x-5">
+                    <div class="flex justify-between items-center mb-4 gap-x-5">
                         <span class="text-4xl font-extrabold">
                             {{ $jagung }}
                             <span class="text-gray-500 text-sm">Kg</span>
                         </span>
                     </div>
-                    <span class="text-sm italic text-gray-500 float-end">Akhir ini</span>
+                    <span class="w-max bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full  border border-green-400">Saat ini</span>
                 </section>
                 {{-- card multivitamin --}}
                 <section class="bg-white w-64 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
@@ -45,13 +45,13 @@
                         </svg>
                         <span class="font-bold">Jumlah Multivitamin</span>
                     </div>
-                    <div class="flex justify-between items-center mb-2 gap-x-5">
+                    <div class="flex justify-between items-center mb-4 gap-x-5">
                         <span class="text-4xl font-extrabold">
                             {{ $multivitamin }}
                             <span class="text-gray-500 text-sm">Kg</span>
                         </span>
                     </div>
-                    <span class="text-sm italic text-gray-500 float-end">Akhir ini</span>
+                    <span class="w-max bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full  border border-green-400">Saat ini</span>
                 </section>
                 {{-- card nameChickencoop --}}
                 <section class="bg-white w-64 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
@@ -60,35 +60,25 @@
                         </svg>
                         <span class="font-bold">Sisa Pakan</span>
                     </div>
-                    <div class="flex justify-between items-center mb-2 gap-x-5">
+                    <div class="flex justify-between items-center mb-4 gap-x-5">
                         <span class="text-4xl font-extrabold">
                             {{ $leftOverFeed }}
                             <span class="text-gray-500 text-sm">Kg</span>
                         </span>
                     </div>
+                    <span class="w-max bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full  border border-red-400">Sisa</span>
                 </section>
             </div>
             {{-- section create --}}
-            <section class="inline-flex items-center gap-x-4 w-full">
+            <section class="inline-flex items-center gap-x-4 w-full fade-up">
                 <a  href="{{ route('pakan.create') }}" class="flex items-center gap-2 text-white bg-yellow-500 w-max hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-500 font-medium rounded-md text-sm px-5 py-2.5 text-center mb-2">
                     <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                     </svg>
                     Buat Data Pakan
                 </a>
-                <div class="flex items-center max-w-xl">   
-                    <label for="simple-search" class="sr-only">Search</label>
-                    <div class="relative w-full">
-                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                            <svg class="w-6 h-6 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
-                            </svg>                          
-                        </div>
-                        <input type="text" wire:model.live="search" id="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full ps-10 p-2.5 " placeholder="Cari ID ..." required />
-                    </div>
-                </div>
                   {{-- fitur filter --}}
-                  <div>
+                <div>
                     <form class="max-w-sm mx-auto flex gap-x-3 ">
                         <div>
                             <select id="month" wire:model.live="bulan" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 me-2">
@@ -117,7 +107,7 @@
                 </button>
             </section>
             {{-- tabel --}}
-            <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5">
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5 fade-up">
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500 ">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-200 ">
                         <tr>
@@ -145,7 +135,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($this->searchPakan as $item)
+                        @forelse ($this->monthlyFeeds as $item)
                             <tr class="odd:bg-white  border-b  border-gray-200">
                                 <td wire:key="{{$item->id}}" class="px-6 py-4">
                                     {{ $item->id}}
@@ -188,7 +178,7 @@
                 </table>
             </div>
             {{-- pagination --}}
-            <div>{{ $this->searchPakan->links() }}</div>
+            <div>{{ $this->monthlyFeeds->links() }}</div>
         </div>
     </div>
 </div>

@@ -5,6 +5,10 @@ namespace App\Livewire\Karyawan;
 use Livewire\Component;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use App\Helpers\ChickensCache;
+use App\Helpers\EggsCache;
+use App\Helpers\EmployeesCache;
 use Livewire\Attributes\Title;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\User;
@@ -13,15 +17,15 @@ use App\Models\Ayam;
 use App\Models\Kandang;
 use Carbon\Carbon;
 
+
 class ViewKaryawan extends Component
 {
     public $name, $kandang;
     public $bulan, $tahun;
 
     public function mount($name){
-        $user = User::where('name', $name)
-        ->with(['kandang.ayam', 'kandang.telur'])
-        ->first();
+        // cache for user
+        $user = EmployeesCache::getUserEmployee($name);
 
         $this->kandang = $user->kandang;
         $this->name = $name;
@@ -45,99 +49,47 @@ class ViewKaryawan extends Component
         $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
         $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
 
-        // Ambil data user berdasarkan nama
-        $user = User::where('name', $this->name)
-            ->with(['kandang.ayam' => function($query) use ($start, $end) {
-                $query->whereBetween('tanggal', [$start, $end]);
-            }, 'kandang.telur' => function($query)  use ($start, $end){
-                $query->whereBetween('tanggal', [$start, $end]);
-        }])
-        ->first(); // Mengambil satu user pertama sesuai nama
+        //  cache
+        $data = EmployeesCache::getUserRelations($this->name, $start, $end);
 
-        $data = [];
+        $page = request()->get('page', 1);
+        $perPage = 5; // jumlah data per halaman
+        $collection = new Collection($data);
 
-        // Cek jika data user ada
-        $kandang = $user->kandang;
-
-        if ($kandang) {
-            $dataAyam = $kandang->ayam()
-                ->whereBetween('tanggal', [$start, $end])
-                ->get()
-                ->groupBy('tanggal');
-    
-            $dataTelur = $kandang->telur()
-                ->whereBetween('tanggal', [$start, $end])
-                ->get()
-                ->groupBy('tanggal');
-
-            $allDates = collect($dataAyam->keys())
-                ->merge($dataTelur->keys())
-                ->unique()
-                ->sort();
-        
-            // Gabungkan berdasarkan tanggal
-            foreach ($allDates as $tanggal) {
-                $ayamHariIni = $dataAyam->get($tanggal)?->first(); // kalau 1 data per tanggal
-                $telurHariIni = $dataTelur->get($tanggal)?->first();
-        
-                $data[] = [
-                    'tanggal' => $tanggal,
-                    'liveChickens' => $ayamHariIni->total_ayam ?? 0,
-                    'deadChickens' => $ayamHariIni->jumlah_ayam_mati ?? 0,
-                    'productionEggs' => $telurHariIni->jumlah_telur_bagus ?? 0,
-                    'crackedEggs' => $telurHariIni->jumlah_telur_retak ?? 0,
-                    'feedChickens' => $ayamHariIni->jumlah_pakan ?? 0,
-                ];
-            }
-        }
-
-        $currentPage = request()->get('page', 1);
-        $perPage = 3; // jumlah data per halaman
-        $offset = ($currentPage - 1) * $perPage;
-
-        $pagedData = new LengthAwarePaginator(
-            collect($data)->slice($offset, $perPage)->values(),
-            count($data),
+        $currentPageItems = $collection->slice(($page - 1) * $perPage, $perPage)->values();
+        return new LengthAwarePaginator(
+            $currentPageItems,
+            $collection->count(),
             $perPage,
-            $currentPage,
+            $page,
             ['path' => request()->url(), 'query' => request()->query()]
         );
-
-        return $pagedData;
     }
 
     public function getChickenComparationProperty()
     {
-        $queryChickens = Ayam::where('kandang_id', $this->kandang?->id);
-
-        $chickensAge = $this->kandang?->created_at;
-        $weekRange = Carbon::parse($chickensAge)->diffInWeeks(now());
-        $weekCount = round($weekRange) + $this->kandang?->umur_ayam;
+        $firstChickens = $this->kandang?->jumlah_ayam;
+        $kandangId = $this->kandang?->id;
+        $firstChickensAge = $this->kandang?->created_at;
+        $baseAge = $this->kandang?->umur_ayam ?? 0;
+        // cache
+        $liveChickens = ChickensCache::getTotalLiveChicken($kandangId, $firstChickens);
+        $deadChickens = ChickensCache::getTotalDeadChicken($kandangId);
+        $chickenAge = ChickensCache::getTotalChickensAge($kandangId, $firstChickensAge, $baseAge);
 
         return [
-            'liveChicken' =>  $this->kandang?->jumlah_ayam  -  $queryChickens->sum('jumlah_ayam_mati'),
-            'deadChicken' => $queryChickens->sum('jumlah_ayam_mati'),
-            'ageChickenNow' => $weekCount,
+            'liveChicken' => $liveChickens,
+            'deadChicken' => $deadChickens,
+            'ageChickenNow' => $chickenAge,
         ];
     }
 
     public function getEggComparationProperty()
     {
-        // menghitung perbulan
-        $queryGoodEgg = Telur::where('kandang_id', $this->kandang?->id)
-            ->whereYear('tanggal', now()->year)
-            ->selectRaw('MONTH(tanggal) as bulan, SUM(jumlah_telur_bagus) as total')
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->pluck('total', 'bulan');
-    
-        $queryCrackedEgg = Telur::where('kandang_id', $this->kandang?->id)
-            ->whereYear('tanggal', now()->year)
-            ->selectRaw('MONTH(tanggal) as bulan, SUM(jumlah_telur_retak) as total')
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->pluck('total', 'bulan');
-    
+        // cache
+        $queryGoodEgg = EggsCache::getGoodEggMonthly($this->kandang?->id);
+        $queryCrackedEgg = EggsCache::getCrackedEggMontly($this->kandang?->id);
+
         $goodEggs = [];
         $crackedEggs = [];
         $labels = [];
@@ -163,13 +115,11 @@ class ViewKaryawan extends Component
 
         $data = $this->getSummaryEmployeeProperty();
 
-        $liveChickens = 0;
         $deadChickens = 0;
         $totalEggs = 0;
         $crackedEggs = 0;
 
         foreach ($data as $item) {
-            $liveChickens += $item['liveChickens'];
             $deadChickens += $item['deadChickens'];
             $totalEggs += $item['productionEggs'];
             $crackedEggs += $item['crackedEggs'];
@@ -182,7 +132,7 @@ class ViewKaryawan extends Component
             'data' => $data,
             'bulan' => $bulan,
             'tahun' => $tahun,
-            'liveChickens' =>number_format($liveChickens, 0, ',', '.'),
+            'liveChickens' =>number_format($this->chickenComparation['liveChicken'], 0, ',', '.'),
             'deadChickens' => number_format($deadChickens, 0, ',', '.'),
             'totalEggs' => number_format($totalEggs, 0, ',', '.'),
             'crackedEggs' => number_format($crackedEggs, 0, ',', '.'),

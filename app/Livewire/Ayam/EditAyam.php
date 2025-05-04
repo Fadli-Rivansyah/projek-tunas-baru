@@ -6,12 +6,15 @@ use Livewire\Component;
 use App\Models\Ayam;
 use App\Models\Kandang;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Cache;
+use App\Helpers\ForgetCache;
 
 
 class EditAyam extends Component
 {
     public $ayam, $kandang;
     public $jumlahAyam_mati, $pakan, $tanggal, $total_ayam;
+    public $bulan, $tahun;
 
     public function mount($id)
     {
@@ -49,6 +52,8 @@ class EditAyam extends Component
             'tanggal.required' => 'Tanggal harus diisi',
         ]);
 
+        // forget  to cache
+        ForgetCache::getForgetCacheChikens($this->kandang?->id, $this->bulan, $this->tahun);
         
         $this->ayam->update([
             'user_id' => auth()->user()->id,

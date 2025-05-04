@@ -8,6 +8,7 @@ use Livewire\Attributes\Title;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use  Illuminate\Database\Eloquent\Collection;
+use App\Helpers\FeedsCache;
 
 class PakanMain extends Component
 {
@@ -17,48 +18,38 @@ class PakanMain extends Component
 
     public function mount()
     {
-             // view date
+         // view date
         $this->bulan = now()->format('m');
         $this->tahun = now()->format('Y');
 
-        $pakan = Pakan::all();
-
-        $totalCorn = $pakan->sum('jumlah_jagung') ?? 0;
-        $totalMultivitamin = $pakan->sum('jumlah_multivitamin') ?? 0;
-
-        $this->totalFeed = $pakan->sum('total_pakan'); 
-        $this->jagung = $totalCorn;
-        $this->multivitamin = $totalMultivitamin;
-        $this->leftOverFeed = $pakan->sum('sisa_pakan');
+        $lastFeed = FeedsCache::getTotalFeeds() ?? 0;
+        $this->totalFeed = FeedsCache::getTotalAllFeeds($this->bulan, $this->tahun) ?? 0;
+        $this->jagung = $lastFeed['jagung'] ?? 0;
+        $this->multivitamin = $lastFeed['multivitamin'] ?? 0;
+        $this->leftOverFeed = $this->jagung + $this->multivitamin;
     }
 
     public function updatedBulan()
     {
-        $this->getSearchPakanProperty();
+        $this->getMonthlyFeedsProperty();
     }
 
     public function updatedTahun()
     {
-        $this->getSearchPakanProperty();
+        $this->getMonthlyFeedsProperty();
     }
 
-    public function getSearchPakanProperty()
+    public function getMonthlyFeedsProperty()
     {
-        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
-        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
-
-        return Pakan::when($this->search, function ($query) {
-            $query->where('id', 'like', '%' . $this->search . '%');
-        })->whereBetween('tanggal', [$start, $end])
-        ->paginate(5);
+        return  FeedsCache::getMonthlyAllFeeds($this->bulan, $this->tahun);
     }
 
     public function exportPdf()
     {
-        $data = $this->getSearchPakanProperty();
-
         $bulan = nama_bulan($this->bulan);
         $tahun = $this->tahun;
+
+        $data = FeedsCache::getMonthlyAllFeeds($this->bulan, $tahun);
 
         $totalFeed = $data->sum('total_pakan');
         $leftOverFeed = $data->sum('sisa_pakan');
@@ -87,6 +78,11 @@ class PakanMain extends Component
     #[Title('Pakan')] 
     public function render()
     {
-        return view('livewire.pages.pakan-main')->layout('layouts.app');
+        return view('livewire.pages.pakan-main',[
+            'totalFeed' => $this->totalFeed,
+            'jagung' =>  $this->jagung ,
+            'multivitamin' => $this->multivitamin ,
+            'leafOverFeed' =>  $this->leftOverFeed 
+        ])->layout('layouts.app');
     }
 }

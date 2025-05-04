@@ -10,8 +10,8 @@ use App\Models\Ayam;
 use Livewire\Attributes\Title;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
-use App\Helpers\CountEggs;
-use App\Helpers\CountChickens;
+use App\Helpers\EggsCache;
+use App\Helpers\ChickensCache;
 
 class KandangMain extends Component
 {
@@ -32,10 +32,10 @@ class KandangMain extends Component
             $firstChickensAge = $this->kandang->created_at ?? 0;
             $baseAge = $this->kandang->umur_ayam ?? 0;
             // Cache total ayam hidup
-            $this->totalChicken = CountChickens::getTotalLiveChicken($kandangId, $firstChickens);
-            $this->eggs = CountEggs::getTotalEggInTheCage($this->kandang->id, $this->tahun, $this->bulan);
+            $this->totalChicken = ChickensCache::getTotalLiveChicken($kandangId, $firstChickens);
+            $this->eggs = EggsCache::getTotalEggInTheCage($this->kandang->id, $this->tahun, $this->bulan);
             // chicken age
-            $this->chickenAge = CountChickens::getTotalChickensAge($kandangId, $firstChickensAge, $baseAge);
+            $this->chickenAge = ChickensCache::getTotalChickensAge($kandangId, $firstChickensAge, $baseAge);
         }
     }
 

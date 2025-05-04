@@ -9,7 +9,7 @@ use Livewire\Attributes\Url;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Cache;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Helpers\CountEggs;
+use App\Helpers\EggsCache;
 
 class TelurMain extends Component
 {
@@ -31,9 +31,9 @@ class TelurMain extends Component
     public function getJumlahTelurProperty()
     {
         // menghitung perbulan
-        $eggs = CountEggs::getMonthlyEggs($this->kandang->id, $this->tahun, $this->bulan);
+        $eggs = EggsCache::getMonthlyEggs($this->kandang?->id, $this->tahun, $this->bulan);
         // menghitung telur keseluruhan
-        $totalEggs =  CountEggs::getTotalEggInTheCage($this->kandang->id, $this->tahun, $this->bulan);
+        $totalEggs = EggsCache::getTotalEggInTheCage($this->kandang?->id, $this->tahun, $this->bulan);
         return [
             'totalEggs' => number_format($totalEggs, 0, ',', '.'),
             'telurBagus' => $eggs->sum('jumlah_telur_bagus') ?? 0,
@@ -56,14 +56,7 @@ class TelurMain extends Component
     // method search dan filter
     public function getFindTelurProperty()
     {
-        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
-        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
-
-        return Telur::where('kandang_id', $this->kandang->id)
-            ->whereBetween('tanggal', [$start, $end])
-            ->when($this->search, function ($query) {
-                $query->where('tanggal', 'like', '%' . $this->search . '%');
-            })->paginate(10);
+        return EggsCache::getTableEggs($this->kandang?->id, $this->tahun, $this->bulan);
     }
 
     // method hapus data telur
@@ -77,16 +70,7 @@ class TelurMain extends Component
 
     public function exportPdf()
     {
-        $data = Cache::remember("kandang_{$this->kandang->id}_export_eggs", 300, function() {
-            $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
-            $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
-            
-            return Telur::with('kandang')
-                ->where('kandang_id', $this->kandang->id)
-                ->whereBetween('tanggal', [$start, $end])
-                ->limit(50)
-                ->get();
-        });
+        $data = $this->getFindTelurProperty();
 
         $bulan = nama_bulan($this->bulan);
         $tahun = $this->tahun;

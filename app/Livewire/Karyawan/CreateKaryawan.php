@@ -5,6 +5,7 @@ namespace App\Livewire\Karyawan;
 use Livewire\Component;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Helper\ForgetCache;
 use Livewire\Attributes\Title;
 
 class CreateKaryawan extends Component
@@ -17,6 +18,8 @@ class CreateKaryawan extends Component
             'nama' => 'required|string|max:255',
             'email' => 'required|email',
         ]);
+        // forget to cache
+        ForgetCache::getForgetCacheEmployees($this->nama);
 
         User::create([
             'name' => $this->nama,

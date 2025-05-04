@@ -5,10 +5,21 @@ namespace App\Livewire\Pakan;
 use Livewire\Component;
 use App\Models\Pakan;
 use App\Models\Kandang;
+use App\Helper\ForgetCache;
+use Illuminate\Support\Facades\Cache;
+use Livewire\Attributes\Title;
 
 class CreatePakan extends Component
 {
     public $jagung, $multivitamin, $tanggal;
+    public $bulan, $tahun;
+
+    public function mount()
+    {
+          // view date
+          $this->bulan = now()->format('m');
+          $this->tahun = now()->format('Y');
+    }
 
     public function save()
     {
@@ -27,6 +38,8 @@ class CreatePakan extends Component
 
         $totalFeed = $this->jagung + $this->multivitamin;
 
+        ForgetCache::getForgetCacheFeeds($this->bulan, $this->tahun);
+
         // create
         Pakan::create([
             'total_pakan' => $totalFeed,
@@ -40,6 +53,7 @@ class CreatePakan extends Component
         return redirect()->route('pakan')->with('success', 'Data pakan berhasil dibuat.');
     }
 
+    #[Title('Buat Data Pakan')] 
     public function render()
     {
         return view('livewire.pakan.create-pakan')->layout('layouts.app');

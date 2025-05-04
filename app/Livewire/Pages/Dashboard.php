@@ -14,10 +14,10 @@ use App\Models\Kandang;
 use App\Models\Pakan;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
-use App\Helpers\CountEggs;
-use App\Helpers\CountFeed;
-use App\Helpers\CountChickens;
-
+use App\Helpers\EggsCache;
+use App\Helpers\FeedsCache;
+use App\Helpers\ChickensCache;
+use App\Helpers\EmployeesCache;
 
 class Dashboard extends Component
 {
@@ -54,32 +54,19 @@ class Dashboard extends Component
         $this->getTableTelurProperty();
         $this->getSummaryEmployeesProperty();
     }
-
     /**
      * ======== dashboard employee =========
      */
     public function getTableTelurProperty()
     {
-        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
-        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
-
-        return Telur::where('kandang_id', $this->kandang?->id)
-            ->whereBetween('tanggal', [$start, $end])->paginate(5);
+        return EggsCache::getTableEggs($this->kandang?->id, $this->tahun, $this->bulan);
     }
 
     public function getMonthlyEggsProperty()
     {
-        $queryEggsGood = Cache::remember("kandang_{$this->kandang?->id}_monthly_goodEggs_dashboard", 300, function() {
-                         return Telur::where('kandang_id', $this->kandang?->id)->whereYear('tanggal', now()->year)
-                                ->selectRaw('MONTH(tanggal) as bulan, SUM(jumlah_telur_bagus) as total')->groupBy('bulan')->orderBy('bulan')
-                                ->pluck('total', 'bulan');
-        });
-
-        $queryEggsCracked = Cache::remember("kandang_{$this->kandang?->id}_monthly_crakedEggs_dashboard", 300, function() {
-                        return Telur::where('kandang_id', $this->kandang?->id)->whereYear('tanggal', now()->year)
-                                ->selectRaw('MONTH(tanggal) as bulan, SUM(jumlah_telur_retak) as total')->groupBy('bulan')->orderBy('bulan')
-                                ->pluck('total', 'bulan');
-        });
+        // cache
+        $queryEggsGood = EggsCache::getGoodEggMonthly($this->kandang?->id);
+        $queryEggsCracked = EggsCache::getCrackedEggMontly($this->kandang?->id);
 
         $labels = [];
         $goodEggs = [];
@@ -105,9 +92,9 @@ class Dashboard extends Component
         $firstChickensAge = $this->kandang?->created_at;
         $baseAge = $this->kandang?->umur_ayam ?? 0;
         // cache
-        $totalChickens = CountChickens::getTotalLiveChicken($kandangId, $firstChickens);
-        $deadChickens = CountChickens::getTotalDeadChicken($kandangId);
-        $chickenAge = CountChickens::getTotalChickensAge($kandangId, $firstChickensAge, $baseAge);
+        $totalChickens = ChickensCache::getTotalLiveChicken($kandangId, $firstChickens);
+        $deadChickens = ChickensCache::getTotalDeadChicken($kandangId);
+        $chickenAge = ChickensCache::getTotalChickensAge($kandangId, $firstChickensAge, $baseAge);
 
         return [
             'totalChickensInCage' => $totalChickens,
@@ -120,33 +107,25 @@ class Dashboard extends Component
     {
         $latestTanggal = Telur::orderByDesc('tanggal')->value('tanggal');
         $latestDate = Carbon::parse($latestTanggal);
-
-        $startOfThisWeek = $latestDate->copy()->startOfWeek();
-        $endOfThisWeek = $latestDate->copy()->endOfWeek();
+        //  last month
+        $lastMonthEgg = EggsCache::getLastMonthGoodEggs($this->kandang?->id, $latestDate);
+        // this month
+        $eggOfTheMonth = EggsCache::getThisMonthGoodEggs($this->kandang?->id, $latestDate);
         
-        $startOfLastWeek = $latestDate->copy()->subWeek()->startOfWeek();
-        $endOfLastWeek = $latestDate->copy()->subWeek()->endOfWeek();
-     
-        // minggu lalu
-        $telurMingguLalu = CountEggs::getLastWeekGoodEggs($this->kandang?->id, $startOfLastWeek,$endOfLastWeek);
-        // menghitung minggu ini
-        $telurMingguIni = CountEggs::getThisWeekGoodEggs($this->kandang?->id, $startOfThisWeek, $endOfThisWeek);
-
-
-        if ($telurMingguLalu > 0) {
-            $selisih = $telurMingguIni - $telurMingguLalu;
-            $persentase = round(($selisih / $telurMingguLalu) * 100, 2);
+        if ($lastMonthEgg > 0) {
+            $selisih = $eggOfTheMonth - $lastMonthEgg;
+            $persentase = round(($selisih / $lastMonthEgg) * 100);
             $naik = $selisih > 0;
-        }elseif($telurMingguIni === $telurMingguLalu){
+        }elseif($eggOfTheMonth === $lastMonthEgg){
             $persentase = 0.00;
             $naik = false;
         }else{
-            $persentase = $telurMingguIni > 0 ? 100 : 0.00;
+            $persentase = $eggOfTheMonth > 0 ? 100 : 0.00;
             $naik = true;
         }
                 
         return [
-            'jumlah' => $telurMingguIni,
+            'jumlah' => $eggOfTheMonth,
             'persentase' => $persentase,
             'naik' => $naik
         ];
@@ -169,28 +148,11 @@ class Dashboard extends Component
      // count all the feed
      public function getFeedAmountProperty()
      {
-        return CountFeed::getTotalFeed();
+        return FeedsCache::getTotalFeeds();
      }
     /**
      * ========== dashboard admin ===========
      */
-    // count all eggs
-    public function getAllEggsProperty()
-    {
-        // get all the eggs
-        $eggs = Telur::whereBetween('tanggal', [$this->start, $this->end])->get();
-        // count all the cracked eggs
-        $crackedEggs = $eggs->sum('jumlah_telur_retak');
-        // count all the good eggs
-        $goodEggs = $eggs->sum('jumlah_telur_bagus');
-
-        return [
-           'totalEggs' => $crackedEggs + $goodEggs, 
-           'crackedEggs' => $crackedEggs,
-           'goodEggs' => $goodEggs,
-        ];  
-    }
-
     // count all monthly eggs
     public function getAllMonthlyEggsProperty()
     {
@@ -223,59 +185,23 @@ class Dashboard extends Component
     // count all chicken like deadChicken and livechicken
     public function getAllChickensProperty()
     {
-        return CountChickens::getChickensInCage($this->start, $this->end);
+        return ChickensCache::getChickensInCage($this->start, $this->end);
     }
-
-   
-
     // count all the employee
     public function getAllEmployeesProperty()
     {
-        return User::where('is_admin', false)->count();
+        return EmployeesCache::getTotalEmployees();
     }
-
     //count all the chickens coops
      public function getAllChickenCoopsProperty()
     {
-        return Kandang::all()->count();
+        return ChickensCache::getTotalChickenInCage();
     }
-
     // summary employee
     public function getSummaryEmployeesProperty()
     {
-        $users = User::where('is_admin', false)
-            ->with(['kandang.ayam', 'kandang.telur'])
-            ->paginate(5);
-
-        $data = [];
-
-        foreach ($users as $user) {
-            $kandang = $user->kandang;
-            $ayamMati = 0;
-            if ($kandang && $kandang->ayam) {
-                $ayamMati = $kandang->ayam
-                    ->where('kandang_id', $kandang->id)
-                    ->sum('jumlah_ayam_mati');
-            }
-
-            $totalAyam = $kandang?->jumlah_ayam - $ayamMati ?? 0;
-           
-            $eggs = 0;
-            if ($kandang && $kandang->telur) {
-                $eggs = $kandang->telur
-                    ->where('kandang_id', $kandang->id)
-                    ->sum('jumlah_telur_bagus');
-            }
-                    
-            $data[] = [
-                    'name' => $kandang?->nama_karyawan ?? '-',
-                    'chickenCoop' => $kandang?->nama_kandang ?? '-',
-                    'totalChicken' => $totalAyam ?? 0,
-                    'deadChicken' => $ayamMati,
-                    'eggs' => $eggs,
-                ];
-            }
-
+        // cache data summary employees
+        $data = EmployeesCache::getEmployeesActivites();
          // Ubah array $data menjadi paginator
         $page = request()->get('page', 1); // ambil halaman dari URL
         $perPage = 5;
@@ -334,11 +260,10 @@ class Dashboard extends Component
             'totalChickens' =>  number_format($this->countChickens['totalChickensInCage'], 0, ',', '.'),
             'totalEmployees' => $this->allEmployees,
             'totalChickenCoops' => $this->allChickenCoops,
-            'totalEggs' => number_format($this->allEggs['totalEggs'], 0, ',', '.'),
             'goodEggs' => $this->allMonthlyEggs['goodEggs'],
             'crackedEggs' => $this->allMonthlyEggs['crackedEggs'],
-            'deadChickens' => $this->allChickens['deadChickens'],
-            'liveChickens' => $this->allChickens['liveChickens'],
+            'deadChickens' => number_format($this->allChickens['deadChickens'], 0, ',', '.'),
+            'liveChickens' => number_format($this->allChickens['liveChickens'], 0, ',', '.'),
             'feed' => $this->feedAmount,
         ])->layout('layouts.app');
     }

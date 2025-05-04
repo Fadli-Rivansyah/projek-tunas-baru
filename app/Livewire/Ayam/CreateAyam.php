@@ -8,21 +8,26 @@ use App\Models\Kandang;
 use App\Models\Pakan;
 use Carbon\Carbon;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Cache;
+use App\Helpers\ForgetCache;
 
 
 class CreateAyam extends Component
 {
     public  $jumlahAyam_mati, $pakan, $tanggal, $total_ayam;
     public $kandang;
+    public $bulan, $tahun;
 
     public function mount()
     {
         // user relation
         $user = auth()->user();
-        $kandang = $user->kandang;
-        $this->kandang = $kandang;
+        $this->kandang = $user->kandang;
 
-        $ayam = Ayam::where('kandang_id', $kandang->id)->sum('jumlah_ayam_mati') - $kandang->jumlah_ayam ?? $kandang->jumlah_ayam;
+        $this->bulan = now()->format('m');
+        $this->tahun = now()->format('Y');
+
+        $ayam = Ayam::where('kandang_id', $this->kandang->id)->sum('jumlah_ayam_mati') - $this->kandang->jumlah_ayam ?? $this->kandang->jumlah_ayam;
         $this->total_ayam =abs($ayam);
     }
 
@@ -52,6 +57,9 @@ class CreateAyam extends Component
             session()->flash('error', 'Stok jagung atau multivitamin tidak cukup.');
             return;
         }
+
+        // forget to cache
+        ForgetCache::getForgetCacheChikens($this->kandang?->id, $this->bulan, $this->tahun);
 
         Ayam::create([
             'user_id' => auth()->user()->id,
