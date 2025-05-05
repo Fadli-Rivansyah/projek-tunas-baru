@@ -45,7 +45,7 @@ php artisan serve
 
 ## 📸 Cuplikan Tampilan
 
-![Dashboard] admin(screenshot/dashboard-admin.png)
-![Dashboard karyawan](screenshot/dashboard-karyawan.png)
-![Halaman ayam](screenshot/halaman-ayam.png)
-![Monitoring karyawan](screenshot/monitoring-karyawan.png)
+![Dashboard] admin(project-baru-farm/screenshot/dashboard-admin.png)
+![Dashboard karyawan](project-baru-farm/screenshot/dashboard-karyawan.png)
+![Halaman ayam](project-baru-farm/screenshot/halaman-ayam.png)
+![Monitoring karyawan](project-baru-farm/screenshot/monitoring-karyawan.png)
