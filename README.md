@@ -45,7 +45,8 @@ php artisan serve
 
 ## 📸 Cuplikan Tampilan
 
-screenshots/dashboard-admin.png
-screenshots/halaman-ayam.png
-screenshots/dashboard-karyawan.png
-screenshots/monitoring-karyawan.png
+![Dashboard] admin(screenshots/dashboard-admin.png)
+![Dashboard karyawan](screenshots/dashboard-karyawan.png)
+![Dashboard karyawan](screenshots/dashboard-karyawan.png)
+![Halaman ayam](screenshots/halaman-ayam.png)
+![Monitoring karyawan](screenshots/monitoring-karyawan.png)
