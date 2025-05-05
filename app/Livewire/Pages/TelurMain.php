@@ -56,7 +56,12 @@ class TelurMain extends Component
     // method search dan filter
     public function getFindTelurProperty()
     {
-        return EggsCache::getTableEggs($this->kandang?->id, $this->tahun, $this->bulan);
+        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
+        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
+     
+        return Telur::where('kandang_id', $this->kandang?->id)
+            ->whereBetween('tanggal', [$start, $end])
+            ->paginate(10);
     }
 
     // method hapus data telur
@@ -70,7 +75,7 @@ class TelurMain extends Component
 
     public function exportPdf()
     {
-        $data = $this->getFindTelurProperty();
+        $data = EggsCache::getTableEggs($this->kandang?->id, $this->tahun, $this->bulan);
 
         $bulan = nama_bulan($this->bulan);
         $tahun = $this->tahun;

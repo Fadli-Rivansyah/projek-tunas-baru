@@ -23,7 +23,7 @@ class EggsCache
     {
         $startLastMonth = $latestDate->copy()->subMonth()->startOfMonth();
         $endLastMonth = $latestDate->copy()->subMonth()->endOfMonth();
-        $nameMonth = $startLastMonth->format('M');
+        $nameMonth = $startLastMonth->format('m');
 
         return Cache::remember("kandang_{$kandangId}_lastMonth_{$nameMonth}_good_eggs", 300, function() use ($kandangId, $startLastMonth, $endLastMonth) {
             return Telur::where('kandang_id', $kandangId)
@@ -36,7 +36,7 @@ class EggsCache
     {
         $startOfThisMonth = $latestDate->copy()->startOfMonth();
         $endOfThisMonth = $latestDate->copy()->endOfMonth();
-        $nameMonth = $startOfThisMonth->format('M');
+        $nameMonth = $startOfThisMonth->format('m');
 
         return Cache::remember("kandang_{$kandangId}_thisMonth_{$nameMonth}_good_eggs", 300, function() use ($kandangId, $startOfThisMonth, $endOfThisMonth) {
             return Telur::where('kandang_id', $kandangId)

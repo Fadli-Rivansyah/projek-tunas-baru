@@ -49,7 +49,7 @@ class PakanMain extends Component
         $bulan = nama_bulan($this->bulan);
         $tahun = $this->tahun;
 
-        $data = FeedsCache::getMonthlyAllFeeds($this->bulan, $tahun);
+        $data = FeedsCache::getMonthlyAllFeeds($this->bulan, $this->tahun);
 
         $totalFeed = $data->sum('total_pakan');
         $leftOverFeed = $data->sum('sisa_pakan');

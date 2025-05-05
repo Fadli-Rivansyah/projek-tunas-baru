@@ -18,7 +18,6 @@ use App\Livewire\Telur\EditTelur;
 use App\Livewire\Pages\PakanMain;
 use App\Livewire\Pakan\CreatePakan;
 use App\Livewire\pakan\EditPakan;
-// use App\Http\Controllers\Report\ReportAyamController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -37,8 +36,6 @@ Route::middleware(['auth', 'not.admin'])->group(function () {
     Route::get('/ayam/{id}/edit', EditAyam::class)->name('ayam.edit');
     Route::get('/ayam/{id}/delete', AyamMain::class)->name('ayam.destroy');
     Route::get('/ayam/filter', AyamMain::class)->name('ayam.filter');
-    // Route::get('/ayam/{name}/export-pdf', [ReportAyamController::class,'exportPdf'])->name('ayam.export.pdf');
-
 
     Route::get('/telur', TelurMain::class)->name('telur');
     Route::get('/telur/create', CreateTelur::class)->name('telur.create');
@@ -61,6 +58,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/pakan/create', CreatePakan::class)->name('pakan.create');
     Route::get('/pakan/{id}/edit', EditPakan::class)->name('pakan.edit');
     Route::delete('/pakan/{id}/delete', PakanMain::class)->name('pakan.destroy');
+});
+
+Route::fallback(function () {
+    return view('livewire.pages.404'); 
 });
 
 require __DIR__.'/auth.php';

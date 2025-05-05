@@ -59,7 +59,12 @@ class AyamMain extends Component
     // method view data filter, search
     public function getMonthlyChickensProperty()
     {
-        return ChickensCache::getMonthlyChickens($this->kandang?->id, $this->tahun, $this->bulan);
+        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
+        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
+     
+        return Ayam::where('kandang_id', $this->kandang?->id)
+        ->whereBetween('tanggal', [$start, $end])
+        ->paginate(10);
     }
 
     public function destroy($id)
@@ -72,7 +77,7 @@ class AyamMain extends Component
 
     public function exportPdf()
     {
-        $data = $this->getMonthlyChickensProperty();
+        $data = ChickensCache::getMonthlyChickens($this->kandang?->id, $this->tahun, $this->bulan);
 
         $bulan = nama_bulan($this->bulan);
         $tahun = $this->tahun;

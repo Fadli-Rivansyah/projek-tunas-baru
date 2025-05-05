@@ -5,7 +5,7 @@ namespace App\Livewire\Karyawan;
 use Livewire\Component;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Helper\ForgetCache;
+use App\Helpers\ForgetCache;
 use Livewire\Attributes\Title;
 
 class CreateKaryawan extends Component
@@ -28,7 +28,6 @@ class CreateKaryawan extends Component
             'is_admin' => 0
         ]);
 
-        $this->reset();
         return redirect()->route('karyawan')->with('success', 'Data karyawan berhasil ditambahkan.');
     }
 

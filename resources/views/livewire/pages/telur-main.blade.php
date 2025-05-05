@@ -70,7 +70,7 @@
                                         height: 180,
                                     },
                                     labels: ['Telur Bagus', 'Telur Retak'],
-                                    series: [{{ $this->jumlahTelur['telurBagus'] }}, {{ $this->jumlahTelur['telurRetak'] }}],
+                                    series: [{{ $this->jumlahTelur['telurBagus'] ?? 100}}, {{ $this->jumlahTelur['telurRetak'] ?? 100 }}],
                                     colors: ['#03a9f4', '#EA3546'],
                                     legend: {
                                         position: 'right',

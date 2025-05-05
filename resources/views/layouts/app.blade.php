@@ -4,24 +4,26 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta name="description" content="Aplikasi pengelolaan data ayam yang memudahkan peternak dalam mencatat, memantau, dan menganalisis data kesehatan, pertumbuhan, dan produksi ayam.">
-        <meta name="keywords" content="pengelolaan data ayam, aplikasi peternakan, manajemen ayam, kesehatan ayam, pertumbuhan ayam, produksi telur, peternakan modern">
-        <meta name="author" content="[Nama Anda atau Nama Perusahaan]">
+        <meta name="description" content="cv tunas baru bergerak dibidang mengolah dan memproduksi protein masyarakat dengan menghasilkan telur yang berkualitas dari ayam yang sehat">
+        <meta name="keywords" content="protein masyarakat, telur ayam masyarakat, cv tunas baru, cv tunas baru protein masyarakat">
+        <meta name="author" content="CV TUNAS BARU">
         <link rel="canonical" href="https://www.contoh.com/pengelolaan-data-ayam">
+
         <meta property="og:title" content="Aplikasi Pengelolaan Data Ayam - [Nama Aplikasi]">
-        <meta property="og:description" content="Aplikasi pengelolaan data ayam yang memudahkan peternak dalam mencatat, memantau, dan menganalisis data kesehatan, pertumbuhan, dan produksi ayam.">
+        <meta property="og:description" content="cv tunas baru bergerak dibidang mengolah dan memproduksi protein masyarakat dengan menghasilkan telur yang berkualitas dari ayam yang sehat ">
         <meta property="og:image" content="https://www.contoh.com/images/thumbnail.jpg">
         <meta property="og:url" content="https://www.contoh.com/pengelolaan-data-ayam">
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="Aplikasi Pengelolaan Data Ayam - [Nama Aplikasi]">
-        <meta name="twitter:description" content="Aplikasi pengelolaan data ayam yang memudahkan peternak dalam mencatat, memantau, dan menganalisis data kesehatan, pertumbuhan, dan produksi ayam.">
+
+        <meta name="twitter:card" content="Cv Tunas Baru">
+        <meta name="twitter:title" content="Protein Untuk Masyarakat">
+        <meta name="twitter:description" content="cv tunas baru bergerak dibidang mengolah dan memproduksi protein masyarakat dengan menghasilkan telur yang berkualitas dari ayam yang sehat ">
         <meta name="twitter:image" content="https://www.contoh.com/images/thumbnail.jpg">
         
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
         
         <title>{{ $title ?? 'Page Title' }}</title>
         <!-- Scripts -->
@@ -55,23 +57,5 @@
         @livewireScripts
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
         @stack('scripts')
-        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-        <script>
-            // AOS.init({
-            //     duration: 400,
-            //     mirror: false,
-            //     once: true,
-        
-            // });
-
-            AOS.init();
-            // document.addEventListener('livewire:load', function () {
-            // });
-
-            document.addEventListener('livewire:updated', function () {
-                AOS.refresh();
-            });
-
-        </script>
     </body>
 </html>

@@ -69,7 +69,7 @@ class ChickensCache
          
             return Ayam::where('kandang_id', $kandangId)
             ->whereBetween('tanggal', [$start, $end])
-            ->paginate(10);
+            ->get();
         });
     }
 }

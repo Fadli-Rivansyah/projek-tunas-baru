@@ -34,7 +34,4 @@ class Telur extends Model
     {
         return $this->belongsTo(Ayam::class);
     }
-
-    //search -> laravel scout
-   
 }

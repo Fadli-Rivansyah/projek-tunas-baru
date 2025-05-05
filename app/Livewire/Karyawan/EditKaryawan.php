@@ -5,6 +5,7 @@ namespace App\Livewire\Karyawan;
 use Livewire\Component;
 use App\Models\User;
 use Livewire\Attributes\Title;
+use App\Helpers\ForgetCache;
 
 class EditKaryawan extends Component
 {

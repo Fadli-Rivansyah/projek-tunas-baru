@@ -4,7 +4,7 @@ namespace App\Livewire\Pakan;
 
 use Livewire\Component;
 use App\Models\Pakan;
-use App\Helper\ForgetCache;
+use App\Helpers\ForgetCache;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Title;
 
@@ -43,7 +43,7 @@ class EditPakan extends Component
         ]);
 
         $totalFeed = $this->jagung + $this->multivitamin;
-        // cache
+        // forget cache
         ForgetCache::getForgetCacheFeeds($this->bulan, $this->tahun);
         // update
         $pakan = Pakan::findOrFail($this->pakan_id);
