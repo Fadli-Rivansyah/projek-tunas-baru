@@ -42,3 +42,10 @@ php artisan migrate
 
 # Jalankan server
 php artisan serve
+
+## 📸 Cuplikan Tampilan
+
+screenshots/dashboard-admin.png
+screenshots/halaman-ayam.png
+screenshots/dashboard-karyawan.png
+screenshots/monitoring-karyawan.png
