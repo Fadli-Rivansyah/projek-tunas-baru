@@ -71,6 +71,18 @@ class EggsCache
         });
     }
 
+    public static function getMontlyEggs_export($kandangId, $tahun, $bulan)
+    {
+         return Cache::remember("kandang_{$kandangId}_eggs_{$bulan}_{$tahun}_export", 300, function() use ($kandangId, $tahun, $bulan) {
+            $start = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth()->toDateString();
+            $end = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->toDateString();
+         
+            return Telur::where('kandang_id', $kandangId)
+            ->whereBetween('tanggal', [$start, $end])
+            ->get();
+        });
+    }
+
     public static function getTableEggs($kandangId, $tahun, $bulan)
     {
          return Cache::remember("kandang_{$kandangId}_eggs_{$bulan}_{$tahun}", 300, function() use ($kandangId, $tahun, $bulan) {
@@ -78,8 +90,8 @@ class EggsCache
             $end = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->toDateString();
          
             return Telur::where('kandang_id', $kandangId)
-            ->whereBetween('tanggal', [$start, $end])
-            ->paginate(10);
+                ->whereBetween('tanggal', [$start, $end])
+                ->paginate(7);
         });
     }
 

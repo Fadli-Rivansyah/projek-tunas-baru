@@ -33,55 +33,6 @@ class EmployeesCache
         });
     }
 
-    public static function getUserRelations($name, $start, $end)
-    {
-        return Cache::remember("user_relations_{$name}", 300, function() use ($name, $start, $end) {
-            $user = User::where('name', $name)
-                ->with(['kandang.ayam' => function($query) use ($start, $end) {
-                    $query->whereBetween('tanggal', [$start, $end]);
-                }, 'kandang.telur' => function($query)  use ($start, $end){
-                    $query->whereBetween('tanggal', [$start, $end]);
-                }])->first();
-
-            $data = [];
-
-            // Cek jika data user ada
-            $kandang = $user->kandang;
-
-            if ($kandang) {
-                $dataAyam = $kandang->ayam()
-                    ->whereBetween('tanggal', [$start, $end])
-                    ->get()
-                    ->groupBy('tanggal');
-        
-                $dataTelur = $kandang->telur()
-                    ->whereBetween('tanggal', [$start, $end])
-                    ->get()
-                    ->groupBy('tanggal');
-
-                $allDates = collect($dataAyam->keys())
-                    ->merge($dataTelur->keys())
-                    ->unique()
-                    ->sort();
-            
-                // Gabungkan berdasarkan tanggal
-                foreach ($allDates as $tanggal) {
-                    $ayamHariIni = $dataAyam->get($tanggal)?->first(); // kalau 1 data per tanggal
-                    $telurHariIni = $dataTelur->get($tanggal)?->first();
-            
-                    $data[] = [
-                        'tanggal' => $tanggal,
-                        'liveChickens' => $ayamHariIni->total_ayam ?? 0,
-                        'deadChickens' => $ayamHariIni->jumlah_ayam_mati ?? 0,
-                        'productionEggs' => $telurHariIni->jumlah_telur_bagus ?? 0,
-                        'crackedEggs' => $telurHariIni->jumlah_telur_retak ?? 0,
-                        'feedChickens' => $ayamHariIni->jumlah_pakan ?? 0,
-                    ];
-                }
-            }
-            return $data;
-        });
-    }
 
     public static function getEmployeesActivites()
     {
@@ -110,7 +61,7 @@ class EmployeesCache
                 }
                         
                 $data[] = [
-                        'name' => $kandang?->nama_karyawan ?? '-',
+                        'name' => $user->name?? '-',
                         'chickenCoop' => $kandang?->nama_kandang ?? '-',
                         'totalChicken' => $totalAyam ?? 0,
                         'deadChicken' => $ayamMati,

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Pakan;
+namespace App\Livewire\Admin\Pakan;
 
 use Livewire\Component;
 use App\Models\Pakan;
@@ -57,6 +57,6 @@ class CreatePakan extends Component
     #[Title('Buat Data Pakan')] 
     public function render()
     {
-        return view('livewire.pakan.create-pakan')->layout('layouts.app');
+        return view('livewire.admin.pakan.create-pakan')->layout('layouts.app');
     }
 }

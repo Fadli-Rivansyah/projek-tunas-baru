@@ -6,6 +6,7 @@
     </x-slot>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            @include('livewire.layout.alert')
             <form class="max-w-xl" wire:submit.prevent="save">
                 <div class=" grid grid-cols-2 gap-x-5">
                     <div class="mb-5">

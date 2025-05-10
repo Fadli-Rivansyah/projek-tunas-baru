@@ -234,7 +234,7 @@ class Dashboard extends Component
             $deadChickens += $item['deadChicken'];
             $totalEggs += $item['eggs'];
         }
-
+ 
         $bulan = nama_bulan($this->bulan);
         $tahun = $this->tahun;
         
@@ -262,7 +262,7 @@ class Dashboard extends Component
             'totalChickenCoops' => $this->allChickenCoops,
             'goodEggs' => $this->allMonthlyEggs['goodEggs'],
             'crackedEggs' => $this->allMonthlyEggs['crackedEggs'],
-            'deadChickens' => number_format($this->allChickens['deadChickens'], 0, ',', '.'),
+            'deadChickens' => number_format($this->allChickens['deadChickensMontly'], 0, ',', '.'),
             'liveChickens' => number_format($this->allChickens['liveChickens'], 0, ',', '.'),
             'feed' => $this->feedAmount,
         ])->layout('layouts.app');

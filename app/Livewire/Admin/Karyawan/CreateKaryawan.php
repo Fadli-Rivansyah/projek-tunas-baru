@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Karyawan;
+namespace App\Livewire\Admin\Karyawan;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Hash;
@@ -34,6 +34,6 @@ class CreateKaryawan extends Component
     #[Title('Buat Karyawan')] 
     public function render()
     {
-        return view('livewire.karyawan.create-karyawan')->layout('layouts.app');
+        return view('livewire.admin.karyawan.create-karyawan')->layout('layouts.app');
     }
 }

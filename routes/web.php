@@ -3,9 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Pages\Dashboard;
 use App\Livewire\Pages\KaryawanMain;
-use App\Livewire\Karyawan\CreateKaryawan;
-use App\Livewire\Karyawan\EditKaryawan;
-use App\Livewire\Karyawan\ViewKaryawan;
+use App\Livewire\Admin\Karyawan\CreateKaryawan;
+use App\Livewire\Admin\Karyawan\EditKaryawan;
+use App\Livewire\Admin\Karyawan\ViewKaryawan;
 use App\Livewire\Pages\KandangMain;
 use App\Livewire\Kandang\CreateKandang;
 use App\Livewire\Kandang\EditKandang;
@@ -16,8 +16,12 @@ use App\Livewire\Pages\TelurMain;
 use App\Livewire\Telur\CreateTelur;
 use App\Livewire\Telur\EditTelur;
 use App\Livewire\Pages\PakanMain;
-use App\Livewire\Pakan\CreatePakan;
-use App\Livewire\pakan\EditPakan;
+use App\Livewire\Admin\Pakan\CreatePakan;
+use App\Livewire\Admin\pakan\EditPakan;
+use App\Livewire\Admin\Chicken\ChickenPageAdmin;
+use App\Livewire\Admin\Chicken\ChickenPageEmployee;
+use App\Livewire\Admin\Egg\EggPageAdmin;
+use App\Livewire\Admin\Egg\EggPageEmployee;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -52,12 +56,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/karyawan', KaryawanMain::class)->name('karyawan');
     Route::get('/karyawan/create', CreateKaryawan::class)->name('karyawan.create');
     Route::get('/karyawan/{id}/edit', EditKaryawan::class)->name('karyawan.edit');
-    Route::get('/karyawan/{name}/view', ViewKaryawan::class)->name('karyawan.view');
+
+    Route::get('/ayam', ChickenPageAdmin::class)->name('chicken.admin.index');
+    Route::get('/ayam/{name}/view', ChickenPageEmployee::class)->name('chicken.admin.view');
+
+    Route::get('/telur', EggPageAdmin::class)->name('egg.admin.index');
+    Route::get('/telur/{name}/view', EggPageEmployee::class)->name('egg.admin.view');
 
     Route::get('/pakan', PakanMain::class)->name('pakan');
     Route::get('/pakan/create', CreatePakan::class)->name('pakan.create');
     Route::get('/pakan/{id}/edit', EditPakan::class)->name('pakan.edit');
-    Route::delete('/pakan/{id}/delete', PakanMain::class)->name('pakan.destroy');
 });
 
 Route::fallback(function () {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Pakan;
+namespace App\Livewire\Admin\Pakan;
 
 use Livewire\Component;
 use App\Models\Pakan;
@@ -55,13 +55,12 @@ class EditPakan extends Component
             'tanggal' => $this->tanggal,
         ]);
 
-        $this->reset();
         return redirect()->route('pakan')->with('success', 'Data pakan berhasil diubah.');
     }
 
     #[Title('Edit Karyawan')] 
     public function render()
     {
-        return view('livewire.pakan.edit-pakan')->layout('layouts.app');
+        return view('livewire.admin.pakan.edit-pakan')->layout('layouts.app');
     }
 }

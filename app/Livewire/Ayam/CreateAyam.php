@@ -45,26 +45,24 @@ class CreateAyam extends Component
             'tanggal.required' => 'Tanggal harus diisi',
         ]);
 
-        // create
         $pakan = Pakan::latest()->first();
+
+        if ($pakan->jumlah_jagung < $this->pakan || $pakan->jumlah_multivitamin < $this->pakan) 
+        {
+            return redirect()->route('ayam.create')->with('error', 'Jumlah pakan tidak mencukupi');
+        }
 
         $pakan->decrement('jumlah_jagung', $this->pakan/2);
         $pakan->decrement('jumlah_multivitamin', $this->pakan/2);
         $pakan->decrement('sisa_pakan', $this->pakan);
 
-        if ($pakan->jumlah_jagung < $this->pakan || $pakan->jumlah_multivitamin < $this->pakan) 
-        {
-            session()->flash('error', 'Stok jagung atau multivitamin tidak cukup.');
-            return;
-        }
-
         // forget to cache
-        ForgetCache::getForgetCacheChikens($this->kandang?->id, $this->bulan, $this->tahun);
+        ForgetCache::getForgetCacheChickens($this->kandang?->id, $this->bulan, $this->tahun);
 
         Ayam::create([
             'user_id' => auth()->user()->id,
             'kandang_id' =>$this->kandang?->id,
-            'total_ayam' => $this->total_ayam,
+            'total_ayam' => $this->total_ayam - $this->jumlahAyam_mati,
             'jumlah_ayam_mati' => $this->jumlahAyam_mati,
             'jumlah_pakan' => $this->pakan,
             'tanggal' => $this->tanggal,

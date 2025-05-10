@@ -10,6 +10,7 @@ use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Cache;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Helpers\EggsCache;
+use App\Helpers\ForgetCache;
 
 class TelurMain extends Component
 {
@@ -69,13 +70,14 @@ class TelurMain extends Component
     {
         $telur= Telur::findOrFail($id);
         $telur->delete();
+        ForgetCache::getForgetCacheEggs($this->kandang?->id, $this->bulan, $this->tahun);
 
         return redirect()->route('telur')->with('success', 'Data telur berhasil dihapus.');
     }
 
     public function exportPdf()
     {
-        $data = EggsCache::getTableEggs($this->kandang?->id, $this->tahun, $this->bulan);
+        $data = EggsCache::getMontlyEggs_export($this->kandang?->id, $this->tahun, $this->bulan);
 
         $bulan = nama_bulan($this->bulan);
         $tahun = $this->tahun;

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Models\Kandang;
 use App\Models\Ayam;
+use Livewire\Attributes\Title;
+
 
 class CreateKandang extends Component
 {
@@ -21,12 +23,12 @@ class CreateKandang extends Component
         $userId = auth()->user()->id;
 
         $this->validate([
-            'nama_kandang' => 'required|string|max:50|min:2',
+            'nama_kandang' => 'required|string|max:50|min:2|unique:kandangs,nama_kandang',
             'nama_karyawan' => 'required|string|max:50|min:2',
             'jumlah_ayam' => 'required|numeric',
             'umur_ayam' => 'required|numeric',
         ],[
-            'nama_kandang.unique' => 'Nama kangdang diisi dengan nama kandan yang berbeda',
+            'nama_kandang.unique' => 'Nama kandang tidak boleh sama dengan nama kandang yang lain',
             'nama_kandang.min' => 'Nama kandang minimal 2 karakter',
             'nama_kandang.max' => 'Nama kandang maksimal 50 karakter',
             'jumlah_ayam.numeric' => 'Jumlah ayam harus berisi angka',
@@ -34,17 +36,27 @@ class CreateKandang extends Component
         ]);
 
         $kandang = Kandang::create([
-            'user_id' => auth()->user()->id,
+            'user_id' => $userId,
             'nama_kandang' => $this->nama_kandang,
             'nama_karyawan' => $this->nama_karyawan,
             'jumlah_ayam' => $this->jumlah_ayam,
             'umur_ayam' => $this->umur_ayam,
         ]);
+
+        Ayam::create([
+            'user_id' => $userId,
+            'kandang_id' => $kandang->id,
+            'total_ayam' => $this->jumlah_ayam,
+            'jumlah_ayam_mati' => 0,
+            'jumlah_pakan' => 0,
+            'tanggal' => now(),
+        ]);
         
-        $this->reset();
+     
         return redirect()->route('kandang')->with('success', 'Data kandang telah dibuat.');
     }
 
+    #[Title('Buat Kandang')] 
     public function render()
     {
         return view('livewire.kandang.create-kandang')->layout('layouts.app');

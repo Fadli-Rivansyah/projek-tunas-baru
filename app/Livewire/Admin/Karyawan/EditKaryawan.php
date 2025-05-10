@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Karyawan;
+namespace App\Livewire\Admin\Karyawan;
 
 use Livewire\Component;
 use App\Models\User;
@@ -38,6 +38,6 @@ class EditKaryawan extends Component
     #[Title('Edit Karyawan')] 
     public function render()
     {
-        return view('livewire.karyawan.edit-karyawan')->layout('layouts.app');
+        return view('livewire.admin.karyawan.edit-karyawan')->layout('layouts.app');
     }
 }

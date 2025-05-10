@@ -4,6 +4,8 @@ namespace App\Livewire\Pages;
 
 use Livewire\Component;
 use App\Models\User;
+use App\Models\Ayam;
+use App\Models\Telur;
 use App\Models\Kandang;
 use Carbon\Carbon;
 use Livewire\Attributes\Title;
@@ -11,6 +13,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Cache;
 use App\Helpers\EmployeesCache;
 use App\Helpers\ChickensCache;
+use App\Helpers\EggsCache;
+use App\Helpers\ForgetCache;
 
 class KaryawanMain extends Component
 {
@@ -31,18 +35,14 @@ class KaryawanMain extends Component
     //show number of employees
     public function getSearchKaryawanProperty()
     {
-        $start = Carbon::createFromDate($this->tahun, $this->bulan, 1)->startOfMonth()->toDateString();
-        $end = Carbon::createFromDate($this->tahun, $this->bulan, 1)->endOfMonth()->toDateString();
-
         return User::with('kandang')
             ->where('is_admin', false)
-            ->whereBetween('created_at', [$start, $end])
             // based on input search
             ->when($this->search, function ($query) {
                 $query->where('id', 'like', '%' . $this->search . '%')
                     ->orWhere('name', 'like', '%' . $this->search . '%');
             })
-            ->paginate(10);
+            ->paginate(7);
     }
     // export to pdf
     public function exportPdf()
@@ -70,7 +70,18 @@ class KaryawanMain extends Component
 
     public function destroy($id)
     {
-        $karyawan = User::findOrFail($id);
+        $karyawan = User::with(['kandang','ayam', 'telur'])->findOrFail($id);
+
+        $karyawan->ayam()->delete();
+        ForgetCache::getForgetCacheChickens($id, $this->bulan, $this->tahun);
+
+        $karyawan->telur()->delete();
+        ForgetCache::getForgetCacheEggs($id, $this->bulan, $this->tahun);
+        
+        $karyawan->kandang()->delete();
+        ForgetCache::getForgetCacheCage();
+    
+        ForgetCache::getForgetCacheEmployees($karyawan->name);
         $karyawan->delete();
 
         return redirect()->route('karyawan')->with('success', 'Data karyawan berhasil dihapus.');

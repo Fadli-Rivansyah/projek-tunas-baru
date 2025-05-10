@@ -13,7 +13,7 @@ use App\Helpers\ForgetCache;
 class EditAyam extends Component
 {
     public $ayam, $kandang;
-    public $jumlahAyam_mati, $pakan, $tanggal, $total_ayam;
+    public $jumlahAyam_mati, $pakan, $tanggal, $total_ayam, $previousTotalChickens;
     public $bulan, $tahun;
 
     public function mount($id)
@@ -26,18 +26,14 @@ class EditAyam extends Component
         ->findOrFail($id);
 
         // tampilkan ke form input
+        $this->previousTotalChickens = $this->ayam->jumlah_ayam_mati;
         $this->jumlahAyam_mati = $this->ayam->jumlah_ayam_mati;
         $this->pakan = $this->ayam->jumlah_pakan;
         $this->tanggal = $this->ayam->tanggal;
+        $this->total_ayam = $this->ayam->total_ayam;
 
-        $this->hitungTotalAyam();
     }
 
-    private function hitungTotalAyam()
-    {
-        $ayamMati = Ayam::where('kandang_id', $this->kandang->id)->sum('jumlah_ayam_mati');
-        $this->total_ayam = $this->kandang->jumlah_ayam - $ayamMati;
-    }
 
     public function editAyam(){
          // cek validasi
@@ -53,12 +49,13 @@ class EditAyam extends Component
         ]);
 
         // forget  to cache
-        ForgetCache::getForgetCacheChikens($this->kandang?->id, $this->bulan, $this->tahun);
+        ForgetCache:: getForgetCacheChickens($this->kandang?->id, $this->bulan, $this->tahun);
+        $fowardTotalChickens = $this->total_ayam + $this->previousTotalChickens;
         
         $this->ayam->update([
             'user_id' => auth()->user()->id,
             'kandang_id' => $this->kandang->id,
-            'total_ayam' => $this->total_ayam,
+            'total_ayam' =>   $fowardTotalChickens - $this->jumlahAyam_mati,
             'jumlah_ayam_mati' => $this->jumlahAyam_mati,
             'jumlah_pakan' => $this->pakan,
             'tanggal' => $this->tanggal,

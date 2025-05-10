@@ -13,6 +13,7 @@ use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Cache;
 use App\Helpers\ChickensCache;
 use App\Helpers\FeedsCache;
+use App\Helpers\ForgetCache;
 
 
 class AyamMain extends Component
@@ -71,6 +72,7 @@ class AyamMain extends Component
     {
         $ayam= Ayam::findOrFail($id);
         $ayam->delete();
+        ForgetCache::getForgetCacheChickens($this->kandang?->id, $this->bulan, $this->tahun);
 
         return redirect()->route('ayam')->with('success', 'Data ayam berhasil dihapus.');
     }

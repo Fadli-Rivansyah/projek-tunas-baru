@@ -57,27 +57,6 @@
                         <input type="text" wire:model.live="search" id="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full ps-10 p-2.5 " placeholder="Temukan karyawan ..." required />
                     </div>
                 </div>
-                {{-- fitur  filter --}}
-                <div>
-                    <form class="max-w-sm mx-auto flex gap-x-3 ">
-                        <div>
-                            <select id="countries" aria-label="pilih bulan" wire:model.live="bulan" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 me-2 ">
-                                @for ($i = 1; $i <= 12; $i++)
-                                <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">
-                                    {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
-                                </option>
-                                @endfor
-                            </select>
-                        </div>
-                        <div>
-                            <select id="countries" wire:model.live="tahun" aria-label="pilih tahun" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 me-2 ">
-                                @for ($y = now()->year; $y >= 2020; $y--)
-                                    <option value="{{ $y }}">{{ $y }}</option>
-                                @endfor
-                            </select>
-                        </div>
-                    </form>
-                </div>
                 {{-- btn export to pdf --}}
                 <button type="button"  wire:click="exportPdf" aria-label="btn export" class="flex items-center gap-3 text-white bg-[#3b5998] hover:bg-[#3b5998]/90 focus:ring-4 focus:outline-none focus:ring-[#3b5998]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 me-2">
                     <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -124,12 +103,6 @@
                                     {{ optional($item->kandang)->nama_kandang ?? '-' }}
                                 </td>
                                 <td class="px-6 inline-flex gap-3 py-4">
-                                    {{-- btn view --}}
-                                    <a href="{{route('karyawan.view', $item->name)}}" aria-label="btn view karyawan" title="Lihat karyawan" class="font-medium text-gray-500 flex items-center">
-                                        <svg class="size-6 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 9h3m-3 3h3m-3 3h3m-6 1c-.306-.613-.933-1-1.618-1H7.618c-.685 0-1.312.387-1.618 1M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm7 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/>
-                                        </svg>
-                                    </a>
                                     {{-- btn edit --}}
                                     <a href="{{route('karyawan.edit', $item->id)}}" aria-label="btn edit"  title="Edit Karyawan" class="font-medium text-gray-500 flex items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">

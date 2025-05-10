@@ -56,8 +56,8 @@
                 <thead>
                   <tr>
                     <th scope="col">No.</th>
-                    <th scope="col">Total Ayam (Sebelumnya)</th>
-                    <th scope="col">Ayam Mati (Sekarang)</th>
+                    <th scope="col">Total Telur Bagus</th>
+                    <th scope="col">Total Telur Retak</th>
                     <th scope="col">Tanggal</th>
                   </tr>
                 </thead>

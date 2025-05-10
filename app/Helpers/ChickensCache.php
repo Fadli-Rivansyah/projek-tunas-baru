@@ -42,14 +42,16 @@ class ChickensCache
             $totalChickens = Ayam::all();
 
             $totalAllDead = $totalChickens->sum('jumlah_ayam_mati'); 
-            $totalDeadChickensMonthly = $totalChickens->whereBetween('tanggal', [$start, $end])->sum('jumlah_ayam_mati');
             $chickenInCage = Kandang::sum('jumlah_ayam');
             
             $liveChickens = $chickenInCage - $totalAllDead;
+            $totalDeadChickensMonthly = $totalChickens->whereBetween('tanggal', [$start, $end])->sum('jumlah_ayam_mati');
+            
     
            return [
-                'deadChickens' => $totalDeadChickensMonthly,
+                'deadChickensMontly' => $totalDeadChickensMonthly,
                 'liveChickens' => $liveChickens,
+                'totalAllDead' => $totalAllDead
            ];
         });
     }

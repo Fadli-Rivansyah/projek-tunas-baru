@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use App\Models\Telur;
 
 class ForgetCache {
-    public static function getForgetCacheChikens($kandangId, $bulan, $tahun)
+    public static function getForgetCacheChickens($kandangId, $bulan, $tahun)
     {
         $keys = [
             "kandang_{$kandangId}_total_liveChicken",
@@ -42,6 +42,7 @@ class ForgetCache {
             "kandang_{$kandangId}_monthly_goodEggs_dashboard",
             "kandang_{$kandangId}_monthly_crakedEggs_dashboard",
             "kandang_{$kandangId}_eggs_{$bulan}_{$tahun}",
+            "kandang_{$kandangId}_eggs_{$bulan}_{$tahun}_export",
             "summary_activities_employees",
         ];
 
@@ -56,7 +57,6 @@ class ForgetCache {
             "user_{$name}_employee",
             "total_employees",
             "total_employees_export",
-            "user_relations_{$name}",
             "summary_activities_employees",
         ];
     

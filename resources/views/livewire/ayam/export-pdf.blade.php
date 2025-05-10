@@ -56,7 +56,7 @@
                 <thead>
                   <tr>
                     <th scope="col">No.</th>
-                    <th scope="col">Total Ayam (Sebelumnya)</th>
+                    <th scope="col">Total Ayam</th>
                     <th scope="col">Ayam Mati (Sekarang)</th>
                     <th scope="col">Jumlah Pakan</th>
                     <th scope="col">Tanggal</th>

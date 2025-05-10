@@ -12,10 +12,12 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use App\Helpers\EggsCache;
 use App\Helpers\ChickensCache;
+use App\Helpers\ForgetCache;
 
 class KandangMain extends Component
 {
     public $kandang, $totalChicken, $chickenAge, $eggs;
+    public $bulan, $tahun;
 
     public function mount()
     {
@@ -41,19 +43,27 @@ class KandangMain extends Component
 
     public function destroy($id)
     {
-        $kandang = Kandang::findOrFail($id);
-        $ayam = $kandang->ayams;
-        $telur = $kandang->telurs;
-        $kandang->delete();
-        if($telur == null || $ayam == null){
-            $telur->delete();
-            $ayam->delete();
+        $kandang = Kandang::where('id', $id)->with(['ayam', 'telur'])->findOrFail($id);
+        
+        // Hapus semua ayam yang terkait
+        if ($kandang->ayam !== null && $kandang->ayam->isNotEmpty()) {
+            $kandang->ayam()->delete();
+            ForgetCache::getForgetCacheChickens($id, $this->bulan, $this->tahun);
         }
+
+        // Hapus semua telur yang terkait
+        if ($kandang->telur !== null && $kandang->telur->isNotEmpty()) {
+            $kandang->telur()->delete();
+            ForgetCache::getForgetCacheEggs($id, $this->bulan, $this->tahun);
+        }
+    
+        ForgetCache::getForgetCacheCage();
+        $kandang->delete();
 
         return redirect()->route('kandang')->with('success', 'Data kandang berhasil dihapus.');
     }
 
-    #[Title('Buat Data Kandang')] 
+    #[Title('Kandang')] 
     public function render()
     {
         return view('livewire.pages.kandang-main')->layout('layouts.app');
