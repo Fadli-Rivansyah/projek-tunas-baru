@@ -12,8 +12,7 @@ use App\Helpers\ForgetCache;
 
 class EditAyam extends Component
 {
-    public $ayam, $kandang;
-    public $jumlahAyam_mati, $pakan, $tanggal, $total_ayam, $previousTotalChickens;
+    public $ayam, $kandang, $jumlahAyam_mati, $pakan, $tanggal, $total_ayam, $previousTotalChickens;
     public $bulan, $tahun;
 
     public function mount($id)
@@ -33,7 +32,6 @@ class EditAyam extends Component
         $this->total_ayam = $this->ayam->total_ayam;
 
     }
-
 
     public function editAyam(){
          // cek validasi

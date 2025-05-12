@@ -39,7 +39,7 @@ Route::middleware(['auth', 'not.admin'])->group(function () {
     Route::get('/ayam/create', CreateAyam::class)->name('ayam.create');
     Route::get('/ayam/{id}/edit', EditAyam::class)->name('ayam.edit');
     Route::get('/ayam/{id}/delete', AyamMain::class)->name('ayam.destroy');
-    Route::get('/ayam/filter', AyamMain::class)->name('ayam.filter');
+    // Route::get('/ayam/filter', AyamMain::class)->name('ayam.filter');
 
     Route::get('/telur', TelurMain::class)->name('telur');
     Route::get('/telur/create', CreateTelur::class)->name('telur.create');
