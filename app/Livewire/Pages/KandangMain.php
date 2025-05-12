@@ -46,18 +46,14 @@ class KandangMain extends Component
         $kandang = Kandang::where('id', $id)->with(['ayam', 'telur'])->findOrFail($id);
         
         // Hapus semua ayam yang terkait
-        if ($kandang->ayam !== null && $kandang->ayam->isNotEmpty()) {
             $kandang->ayam()->delete();
             ForgetCache::getForgetCacheChickens($id, $this->bulan, $this->tahun);
-        }
 
         // Hapus semua telur yang terkait
-        if ($kandang->telur !== null && $kandang->telur->isNotEmpty()) {
             $kandang->telur()->delete();
             ForgetCache::getForgetCacheEggs($id, $this->bulan, $this->tahun);
-        }
-    
-        ForgetCache::getForgetCacheCage();
+
+            ForgetCache::getForgetCacheCage();
         $kandang->delete();
 
         return redirect()->route('kandang')->with('success', 'Data kandang berhasil dihapus.');

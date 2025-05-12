@@ -43,7 +43,6 @@ class EditKandang extends Component
             'umur_ayam' => $this->umur_ayam,
         ]);
 
-        $this->reset();
         return redirect()->route('kandang')->with('success', 'Data kandang berhasil dibuat.');
     }
 

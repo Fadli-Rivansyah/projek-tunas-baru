@@ -55,7 +55,7 @@ class KaryawanMain extends Component
         $totalEmployees = $data->count();
         $totalChickenCoops =  $this->kandang;
         
-        $pdf = Pdf::loadView('livewire.karyawan.export-pdf', [
+        $pdf = Pdf::loadView('livewire.admin.karyawan.export-pdf', [
             'data' => $data,
             'bulan' => $bulan,
             'tahun' => $tahun,

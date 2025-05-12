@@ -54,7 +54,7 @@ class PakanMain extends Component
         $totalFeed = $data->sum('total_pakan');
         $leftOverFeed = $data->sum('sisa_pakan');
 
-        $pdf = Pdf::loadView('livewire.pakan.export-pdf', [
+        $pdf = Pdf::loadView('livewire.admin.pakan.export-pdf', [
             'data' => $data,
             'totalFeed' => number_format($totalFeed , 0, ',', '.'),
             'leftOverFeed' => number_format($leftOverFeed , 0, ',', '.'),
