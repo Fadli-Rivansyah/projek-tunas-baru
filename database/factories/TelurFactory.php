@@ -17,7 +17,8 @@ class TelurFactory extends Factory
     public function definition(): array
     {
         return [
-            'kandang_id' => fn () => Kandang::inRandomOrder()->first()->id,
+            'user_id' =>  fake()->numberBetween(1, 50),
+            'kandang_id' =>  fake()->numberBetween(1, 50),
             'jumlah_telur_bagus' => fake()->numberBetween(3000,4000),
             'jumlah_telur_retak' => fake()->numberBetween(100,200),
             'tanggal' => fake()->date(),

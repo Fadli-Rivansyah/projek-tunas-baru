@@ -17,9 +17,9 @@ class KandangFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => fn () => User::inRandomOrder()->first()->id,
+            'user_id' => fake()->numberBetween(1, 50),
             'nama_kandang' => fake()->word(),
-            'nama_karyawan' => fn () => User::inRandomOrder()->first()->name,
+            'nama_karyawan' => fake()->name(),
             'umur_ayam' => fake()->numberBetween(50,80),
             'jumlah_ayam' => fake()->numberBetween(4000,5000),
         ];

@@ -46,14 +46,14 @@ class KandangMain extends Component
         $kandang = Kandang::where('id', $id)->with(['ayam', 'telur'])->findOrFail($id);
         
         // Hapus semua ayam yang terkait
-            $kandang->ayam()->delete();
-            ForgetCache::getForgetCacheChickens($id, $this->bulan, $this->tahun);
+        $kandang->ayam()->delete();
+        ForgetCache::getForgetCacheChickens($id, $this->bulan, $this->tahun);
 
         // Hapus semua telur yang terkait
-            $kandang->telur()->delete();
-            ForgetCache::getForgetCacheEggs($id, $this->bulan, $this->tahun);
+        $kandang->telur()->delete();
+        ForgetCache::getForgetCacheEggs($id, $this->bulan, $this->tahun);
 
-            ForgetCache::getForgetCacheCage();
+        ForgetCache::getForgetCacheCage();
         $kandang->delete();
 
         return redirect()->route('kandang')->with('success', 'Data kandang berhasil dihapus.');
@@ -63,6 +63,5 @@ class KandangMain extends Component
     public function render()
     {
         return view('livewire.pages.kandang-main')->layout('layouts.app');
-    }
-    
+    }   
 }

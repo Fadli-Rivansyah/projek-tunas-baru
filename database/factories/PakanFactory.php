@@ -16,10 +16,14 @@ class PakanFactory extends Factory
      */
     public function definition(): array
     {
+        $jagung = fake()->numberBetween(40,100);
+        $multivitamin = fake()->numberBetween(40,100);
+
         return [
-            'kandang_id' => fn () => Kandang::inRandomOrder()->first()->id,
-            'jumlah_jagung' => fake()->numberBetween(40,70),
-            'jumlah_multivitamin' => fake()->numberBetween(40,70),
+            'total_pakan' => $jagung + $multivitamin,
+            'jumlah_jagung' => $jagung,
+            'jumlah_multivitamin' => $multivitamin,
+            'sisa_pakan' => $jagung + $multivitamin,
             'tanggal' => fake()->date()
         ];
     }

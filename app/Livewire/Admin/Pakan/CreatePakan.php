@@ -50,7 +50,6 @@ class CreatePakan extends Component
             'tanggal' => $this->tanggal,
         ]);
 
-        $this->reset();
         return redirect()->route('pakan')->with('success', 'Data pakan berhasil dibuat.');
     }
 

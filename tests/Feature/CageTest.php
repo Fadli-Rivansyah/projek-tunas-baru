@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use App\Livewire\Pages\KandangMain;
 use App\Livewire\Kandang\CreateKandang;
 use App\Livewire\Kandang\EditKandang;
@@ -18,11 +17,11 @@ class CageTest extends TestCase
     use RefreshDatabase;
 
     protected $user, $kandang, $chicken;
-
+    
     protected  function setUp(): void
     {
         parent::setUp();
-
+        
         $this->user = User::factory()->create([
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
@@ -38,13 +37,14 @@ class CageTest extends TestCase
         ]);
 
         $this->chicken = Ayam::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id' => $this->user?->id,
             'kandang_id' => $this->kandang?->id,
-            'total_ayam' => 3980,
-            'jumlah_ayam_mati' => 20,
-            'jumlah_pakan' => 10,
-            'tanggal' => now(),
+            'total_ayam' =>5000,
+            'jumlah_ayam_mati' => 0,
+            'jumlah_pakan' => 0,
+            'tanggal' => now()->toDateString()
         ]);
+
 
         $this->actingAs($this->user);
     }
@@ -68,20 +68,28 @@ class CageTest extends TestCase
     public function test_validation_for_create_data_cage(): void
     {
         Livewire::test(CreateKandang::class)
-            ->set('nama_kandang', $this->kandang?->kandang)
-            ->set('nama_karyawan', $this->kandang?->nama_karyawan)
-            ->set('jumlah_ayam', $this->kandang?->jumlah_ayam)
-            ->set('umur_ayam', $this->kandang?->umur_ayam)
-            ->call('save')
-            ->assertRedirect('/kandang');
+            ->set('nama_kandang', 'kandang01')
+            ->set('nama_karyawan', 'rudi')
+            ->set('umur_ayam', 51)
+            ->set('jumlah_ayam', 5000)
+            ->call('save');
 
             // Check if the database is correct
         $this->assertDatabaseHas('kandangs', [
-            'user_id' => $this->user?->id,
-            'nama_kandang' => $this->kandang?->nama_kandang,
-            'nama_karyawan' => $this->kandang?->nama_karyawan,
-            'jumlah_ayam' => $this->kandang?->jumlah_ayam,
-            'umur_ayam' => $this->kandang?->umur_ayam,
+            'user_id' => $this->user->id,
+            'nama_kandang' => $this->kandang->nama_kandang,
+            'nama_karyawan' => $this->kandang->nama_karyawan,
+            'umur_ayam' =>$this->kandang->umur_ayam,
+            'jumlah_ayam' => $this->kandang->jumlah_ayam,
+        ]);
+
+         $this->assertDatabaseHas('ayams', [
+            'user_id' => $this->user->id,
+            'kandang_id' => $this->kandang->id,
+            'total_ayam' => $this->chicken->total_ayam,
+            'jumlah_ayam_mati' => $this->chicken->jumlah_ayam_mati,
+            'jumlah_pakan' => $this->chicken->jumlah_pakan,
+            'tanggal' => now()->toDateString(), // Perhatikan format tanggal
         ]);
     }
 

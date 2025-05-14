@@ -10,7 +10,7 @@ use App\Helpers\ForgetCache;
 
 class EditTelur extends Component
 {
-    public $jumlahTelur_bagus, $jumlahTelur_retak, $tanggal, $kandang_id;
+    public $jumlahTelur_bagus, $jumlahTelur_retak, $tanggal, $telur_id ,$kandang;
     public $bulan, $tahun;
 
     public function mount($id)
@@ -26,7 +26,7 @@ class EditTelur extends Component
         $this->jumlahTelur_bagus = $telur->jumlah_telur_bagus;
         $this->jumlahTelur_retak = $telur->jumlah_telur_retak;
         $this->tanggal = $telur->tanggal;
-        $this->kandang_id = $id;
+        $this->telur_id = $id;
     }
 
     public function editTelur()
@@ -44,20 +44,18 @@ class EditTelur extends Component
             'tanggal.required' => 'Tanggal harus diisi',
         ]);
         // forget to cache
-        ForgetCache::getForgetCacheEggs($this->kandang_id, $this->bulan, $this->tahun);
+        ForgetCache::getForgetCacheEggs($this->kandang?->id, $this->bulan, $this->tahun);
         
-        $kandang = Kandang::findOrFail(auth()->user()->kandang?->id);
         // create
-        $dataTelur = Telur::findOrFail($this->kandang_id);
+        $dataTelur = Telur::findOrFail($this->telur_id);
         $dataTelur->update([
             'user_id' => auth()->user()->id,
-            'kandang_id' => $kandang->id,
+            'kandang_id' => $this->kandang?->id,
             'jumlah_telur_bagus' => $this->jumlahTelur_bagus,
             'jumlah_telur_retak' => $this->jumlahTelur_retak,
             'tanggal' => $this->tanggal,
         ]);
 
-        $this->reset();
         return redirect()->route('telur')->with('success', 'Data telur berhasil diubah.');
     }
 
