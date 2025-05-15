@@ -4,15 +4,23 @@ namespace App\Livewire\Kandang;
 
 use Livewire\Component;
 use App\Models\Kandang;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Attributes\Title;
 
 class EditKandang extends Component
 {
     public $nama_kandang, $nama_karyawan, $jumlah_ayam, $umur_ayam, $kandang_id;
+    public $kandang;
+
+    use AuthorizesRequests;
 
     public function mount($id)
     {
         $kandang = Kandang::findOrFail($id);
+
+        $this->authorize('update', $kandang);
+        $this->kandang = $kandang;
+
         $this->kandang_id = $kandang->id;
         $this->nama_karyawan = auth()->user()->name;
         $this->nama_kandang = $kandang->nama_kandang;
@@ -21,6 +29,8 @@ class EditKandang extends Component
     }
 
     public function editKandang(){
+        $this->authorize('update', $this->kandang);
+
         $this->validate([
             'nama_kandang' => 'required|string|max:50|min:2',
             'nama_karyawan' => 'required|max:50|min:5',

@@ -32,14 +32,18 @@ class ChickenTest extends TestCase
 
         $this->actingAs($this->user);
 
-        $this->kandang = Kandang::factory()->create([
-            'user_id' => $this->user?->id,
+        $this->kandang = Kandang::create([
+            'user_id' => $this->user->id,
+            'nama_kandang' => 'kandang01',
+            'nama_karyawan' => $this->user->name,
+            'jumlah_ayam' => 5000,
+            'umur_ayam' => 50,
         ]);
 
-        $this->chicken = Ayam::factory()->create([
-            'user_id' => $this->user?->id,
-            'kandang_id' => $this->kandang?->id,
-            'total_ayam' =>3980,
+        $this->chicken = Ayam::create([
+            'user_id' => $this->user->id,
+            'kandang_id' => $this->kandang->id,
+            'total_ayam' =>  3980,
             'jumlah_ayam_mati' => 20,
             'jumlah_pakan' => 10,
             'tanggal' => now()->toDateString()

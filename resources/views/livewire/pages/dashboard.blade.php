@@ -432,6 +432,9 @@
                                         </svg>
                                     Export PDF
                                 </button>
+                                <div wire:loading wire:target="exportPdf" class="translate-x-5">
+                                    <span class="italic animate-pulse">Mencoba mengunduh ...</span>
+                                </div>
                             </section>
 
                             {{-- table --}}

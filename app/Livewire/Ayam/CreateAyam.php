@@ -47,8 +47,11 @@ class CreateAyam extends Component
 
         $pakan = Pakan::latest()->first();
 
-        if ($pakan->jumlah_jagung < $this->pakan || $pakan->jumlah_multivitamin < $this->pakan) 
-        {
+        if (!$pakan || is_null($pakan->jumlah_jagung) || is_null($pakan->jumlah_multivitamin)) {
+            return redirect()->route('ayam.create')->with('error', 'Admin belum siap!!');
+        }
+        
+        if ($pakan->jumlah_jagung < $this->pakan || $pakan->jumlah_multivitamin < $this->pakan) {
             return redirect()->route('ayam.create')->with('error', 'Jumlah pakan tidak mencukupi');
         }
 

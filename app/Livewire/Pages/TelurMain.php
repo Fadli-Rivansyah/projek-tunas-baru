@@ -11,12 +11,15 @@ use Illuminate\Support\Facades\Cache;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Helpers\EggsCache;
 use App\Helpers\ForgetCache;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TelurMain extends Component
 {
     public $search = '';
     public $kandang, $bulan, $tahun;
     public $telur, $totalTelur;
+
+    use AuthorizesRequests;
 
     public function mount()
     {
@@ -69,6 +72,7 @@ class TelurMain extends Component
     public function destroy($id)
     {
         $telur= Telur::findOrFail($id);
+
         $telur->delete();
         ForgetCache::getForgetCacheEggs($this->kandang?->id, $this->bulan, $this->tahun);
 

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Helpers\ChickensCache;
 use App\Helpers\FeedsCache;
 use App\Helpers\ForgetCache;
-
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AyamMain extends Component
 {
@@ -22,6 +22,8 @@ class AyamMain extends Component
     public $totalAyam, $totalMati, $pakan, $kandang, $chickenAge;
     public $tahun, $bulan;
     public $dataAyam=[];
+    
+    use AuthorizesRequests;
 
     public function mount()
     {
@@ -68,10 +70,12 @@ class AyamMain extends Component
         ->paginate(10);
     }
 
+
     public function destroy($id)
     {
         $ayam= Ayam::findOrFail($id);
         $ayam->delete();
+        
         ForgetCache::getForgetCacheChickens($this->kandang?->id, $this->bulan, $this->tahun);
 
         return redirect()->route('ayam')->with('success', 'Data ayam berhasil dihapus.');

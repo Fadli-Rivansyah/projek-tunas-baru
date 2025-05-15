@@ -28,7 +28,7 @@ class CageTest extends TestCase
             'is_admin' => false,
         ]);
 
-        $this->kandang = Kandang::factory()->create([
+        $this->kandang = Kandang::create([
             'user_id' => $this->user->id,
             'nama_kandang' => 'kandang01',
             'nama_karyawan' => $this->user->name,
@@ -36,7 +36,7 @@ class CageTest extends TestCase
             'umur_ayam' => 50,
         ]);
 
-        $this->chicken = Ayam::factory()->create([
+        $this->chicken = Ayam::create([
             'user_id' => $this->user?->id,
             'kandang_id' => $this->kandang?->id,
             'total_ayam' =>5000,
@@ -44,7 +44,6 @@ class CageTest extends TestCase
             'jumlah_pakan' => 0,
             'tanggal' => now()->toDateString()
         ]);
-
 
         $this->actingAs($this->user);
     }
@@ -59,8 +58,25 @@ class CageTest extends TestCase
     /** test btn create cage. is it properly when on apply. this goes to the create cage page */
     public function test_page_create_cage(): void
     {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
         $response = $this->get('/kandang/create');
+
         $response->assertStatus(200); 
+        $response->assertSee('form');
+    }
+    public function test_page_create_cage_if_already_have_one(): void
+    {
+        $user = User::factory()->create();
+
+        $this->kandang = [
+            'user_id' => $user->id,
+        ];
+
+        $response = $this->get('/kandang/create');
+
+        $response->assertStatus(403); 
         $response->assertSee('form');
     }
 
@@ -89,7 +105,7 @@ class CageTest extends TestCase
             'total_ayam' => $this->chicken->total_ayam,
             'jumlah_ayam_mati' => $this->chicken->jumlah_ayam_mati,
             'jumlah_pakan' => $this->chicken->jumlah_pakan,
-            'tanggal' => now()->toDateString(), // Perhatikan format tanggal
+            'tanggal' => now()->toDateString(), 
         ]);
     }
 

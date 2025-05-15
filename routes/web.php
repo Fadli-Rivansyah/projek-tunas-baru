@@ -31,7 +31,7 @@ Route::get('dashboard', Dashboard::class)->middleware(['auth', 'verified'])->nam
 Route::middleware(['auth', 'not.admin'])->group(function () {
     
     Route::get('/kandang', KandangMain::class)->name('kandang');
-    Route::get('/kandang/create', CreateKandang::class)->name('kandang.create');
+    Route::get('/kandang/create', CreateKandang::class)->name('kandang.create')->middleware('prevent.multiple.cage');
     Route::get('/kandang/{id}/edit', EditKandang::class)->name('kandang.edit');
     Route::get('/kandang/{id}/delete', KandangMain::class)->name('kandang.destroy');
 

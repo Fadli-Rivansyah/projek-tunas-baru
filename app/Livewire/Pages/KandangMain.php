@@ -24,10 +24,13 @@ class KandangMain extends Component
         $this->bulan = now()->format('m');
         $this->tahun = now()->format('Y');
         
-        $this->kandang = Cache::remember("kandang_user_karyawan",  300, function() {
-            return Kandang::where('user_id', auth()->id())->first();
-        });
+        $user = auth()->user();
+        $this->kandang = $user->kandang;
 
+        // if (auth()->user()->kandang()->exists()) {
+        //     return redirect()->route('kandang')->with('success', 'Kamu sudah punya kandang.');
+        // }
+        
         if($this->kandang){
             $firstChickens = $this->kandang->jumlah_ayam ?? 0;
             $kandangId = $this->kandang->id;
@@ -39,6 +42,11 @@ class KandangMain extends Component
             // chicken age
             $this->chickenAge = ChickensCache::getTotalChickensAge($kandangId, $firstChickensAge, $baseAge);
         }
+    }
+
+    public function getTableCageProperty()
+    {
+        return Kandang::where('user_id', auth()->id())->first();
     }
 
     public function destroy($id)

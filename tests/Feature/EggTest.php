@@ -29,11 +29,15 @@ class EggTest extends TestCase
 
         $this->actingAs($this->user);
 
-        $this->kandang = Kandang::factory()->create([
-            'user_id' => $this->user->id
+        $this->kandang = Kandang::create([
+            'user_id' => $this->user->id,
+            'nama_kandang' => 'kandang01',
+            'nama_karyawan' => $this->user->name,
+            'jumlah_ayam' => 5000,
+            'umur_ayam' => 50,
         ]);
 
-        $this->telur= Telur::factory()->create([
+        $this->telur= Telur::create([
             'user_id' => $this->user->id,
             'kandang_id' => $this->kandang->id,
             'jumlah_telur_bagus' => 4000,
@@ -101,16 +105,7 @@ class EggTest extends TestCase
     /** test validation in form edit egg. is it properly */
     public function test_validation_form_edit_egg(): void
     {
-     // Setup
-        // $telur = Telur::factory()->create([
-        //     'user_id' => $this->user->id,
-        //     'kandang_id' => $this->kandang->id,
-        //     'jumlah_telur_bagus' => 4000,
-        //     'jumlah_telur_retak' => 25,
-        //     'tanggal' => $this->telur->tanggal,
-        // ]);
 
-        // Pastikan parameter sesuai dengan mount() di komponen Livewire
         Livewire::test(EditTelur::class, ['id' => $this->telur->id])
             ->set('kandang', $this->kandang->id)
             ->set('telur_id', $this->telur->id)

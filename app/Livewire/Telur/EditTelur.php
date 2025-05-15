@@ -7,30 +7,38 @@ use App\Models\Telur;
 use App\Models\Kandang;
 use Livewire\Attributes\Title;
 use App\Helpers\ForgetCache;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class EditTelur extends Component
 {
     public $jumlahTelur_bagus, $jumlahTelur_retak, $tanggal, $telur_id ,$kandang;
     public $bulan, $tahun;
+    public $telur;
+
+    use AuthorizesRequests;
 
     public function mount($id)
     {
         // user relation
         $user = auth()->user();
         $this->kandang = $user->kandang;
-
+        
         $this->bulan = now()->format('m');
         $this->tahun = now()->format('Y');
-
+        
         $telur = Telur::findOrFail($id);
         $this->jumlahTelur_bagus = $telur->jumlah_telur_bagus;
         $this->jumlahTelur_retak = $telur->jumlah_telur_retak;
         $this->tanggal = $telur->tanggal;
         $this->telur_id = $id;
+        
+        $this->authorize('update', $telur);
+        $this->telur = $telur;
     }
 
     public function editTelur()
     {
+        $this->authorize('update', $this->telur);
         // cek validasi
         $this->validate([
             'jumlahTelur_bagus' => 'required|numeric|min:0',

@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\Is_admin::class,
             'not.admin' => \App\Http\Middleware\NotAdmin::class,
+            'prevent.multiple.cage' => \App\Http\Middleware\PreventMultipleCage::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

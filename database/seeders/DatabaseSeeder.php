@@ -17,17 +17,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-        // Kandang::factory(10)->create();
-        // Pakan::factory(30)->create();
-        // Ayam::factory(30)->create();
-        // Telur::factory(30)->create();
+        User::factory(10)->create();
 
         User::factory()->create([
             'name' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => 'password',
             'is_admin' => true
+        ]);
+
+        Pakan::create([
+            'total_pakan' => 200,
+            'jumlah_jagung' => 100,
+            'jumlah_multivitamin' => 100 ,
+            'sisa_pakan' => 200,
+            'tanggal' => now(),
         ]);
     }
 }

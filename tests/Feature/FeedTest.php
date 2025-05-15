@@ -34,12 +34,12 @@ class FeedTest extends TestCase
         $jagung = fake()->numberBetween(40,100);
         $multivitamin = fake()->numberBetween(40,100);
 
-        $this->pakan = Pakan::factory()->create([
-                'total_pakan' => $jagung + $multivitamin,
-                'jumlah_jagung' => $jagung,
-                'jumlah_multivitamin' => $multivitamin,
-                'sisa_pakan' => $jagung + $multivitamin,
-                'tanggal' => now()
+        $this->pakan = Pakan::create([
+            'total_pakan' => $jagung + $multivitamin,
+            'jumlah_jagung' => $jagung,
+            'jumlah_multivitamin' => $multivitamin,
+            'sisa_pakan' => $jagung + $multivitamin,
+            'tanggal' => now()
         ]);
     }
     
@@ -63,8 +63,6 @@ class FeedTest extends TestCase
     /** test for validation data feed and property that used in code CreatePakan.php */
     public function test_validation_for_create_data_feed(): void
     {
-        $pakan = Pakan::factory()->create();
-
         Livewire::test(CreatePakan::class)
             ->set('jagung', 100)
             ->set('multivitamin', 100)
@@ -85,7 +83,6 @@ class FeedTest extends TestCase
     /** test required in form input create Feed*/
     public function test_create_feed_required_fields(): void
     {
-
         Livewire::test(CreatePakan::class)
             ->call('save')
             ->assertHasErrors(['jagung' => ['required']])

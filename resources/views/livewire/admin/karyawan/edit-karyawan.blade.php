@@ -16,6 +16,9 @@
                     <input type="email" wire:model="email" id="email" name="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full p-2.5" placeholder="@name" required />
                 </div>
                 <button type="submit" class="text-white bg-yellow-500 hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ">Simpan</button>
+                <div wire:loading class="translate-x-5">
+                    <span class="italic animate-pulse">Mencoba menyimpan ...</span>
+                </div>
             </form>
         </div>
     </div>

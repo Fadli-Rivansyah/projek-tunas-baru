@@ -8,12 +8,16 @@ use App\Models\Kandang;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Cache;
 use App\Helpers\ForgetCache;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 
 class EditAyam extends Component
 {
-    public $ayam, $kandang, $jumlahAyam_mati, $pakan, $tanggal, $total_ayam, $previousTotalChickens;
+    public $kandang, $jumlahAyam_mati, $pakan, $tanggal, $total_ayam, $previousTotalChickens;
     public $bulan, $tahun;
+    public $ayam;
+
+    use AuthorizesRequests;
 
     public function mount($id)
     {
@@ -21,9 +25,10 @@ class EditAyam extends Component
         $user = auth()->user();
         $this->kandang = $user->kandang;
 
-        $this->ayam = Ayam::where('kandang_id', $this->kandang->id)
-        ->findOrFail($id);
+        $ayam = Ayam::findOrFail($id);
 
+        $this->authorize('update', $ayam);
+        $this->ayam = $ayam;
         // tampilkan ke form input
         $this->previousTotalChickens = $this->ayam->jumlah_ayam_mati;
         $this->jumlahAyam_mati = $this->ayam->jumlah_ayam_mati;
@@ -34,6 +39,8 @@ class EditAyam extends Component
     }
 
     public function editAyam(){
+        //authorization other users
+        $this->authorize('update', $this->ayam);
          // cek validasi
          $this->validate([
             'jumlahAyam_mati' => 'required|numeric|min:0',

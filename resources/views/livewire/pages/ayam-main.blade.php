@@ -122,6 +122,9 @@
                             </svg>
                             Export PDF
                         </button>
+                        <div wire:loading wire:target="exportPdf" class="translate-x-5">
+                            <span class="italic animate-pulse">Mencoba mengunduh ...</span>
+                        </div>
                     </section>
                     {{-- table --}}
                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5 mb-4 fade-up">
@@ -150,7 +153,7 @@
                             </thead>
                             <tbody>
                                 @forelse ($this->monthlyChickens as $item)
-                                    <tr class="odd:bg-white  border-b  border-gray-200">
+                                    <tr class="odd:bg-white border-b border-gray-200">
                                         <td wire:key="{{$item->id}}" class="px-6 py-4">
                                             {{ $loop->iteration }}
                                         </td>
