@@ -303,7 +303,6 @@
                                 <span class="text-4xl font-extrabold">{{ $totalChickenCoops }}  <span class="text-gray-500 text-sm">Barak</span></span>
                             </div>
                             <span class="bg-yellow-100 text-yellow-800 w-max text-xs font-medium me-2 px-2.5 py-0.5 rounded-full border border-yellow-300">Saat Ini</span>
-
                         </section>
                         {{-- total live chicken --}}
                         <section class="bg-white w-72 flex justify-between flex-col overflow-hidden shadow-md p-4 sm:rounded-lg">
@@ -315,7 +314,6 @@
                             </div>
                             <div class="flex justify-between items-center gap-x-5 mb-4">
                                 <span class="text-4xl font-extrabold">{{ $liveChickens }} <span class="text-gray-500 text-sm">Ekor</span></span>
-
                             </div>
                             <span class="w-max bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full  border border-green-400">Hidup</span>
                         </section>
@@ -463,10 +461,10 @@
                                         @forelse ($this->summaryEmployees as $item)
                                             <tr class="odd:bg-white  border-b  border-gray-200">
                                                 <td scope="row" class="px-6 py-4">
-                                                    {{ $item['name'] }}
+                                                    {{$item['name']}}
                                                 </td>
                                                 <td class="px-6 py-4">
-                                                    {{ $item['chickenCoop'] }}
+                                                    {{$item['chickenCoop']}}
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     {{  number_format($item['totalChicken'], 0, ',', '.') }} Ekor
@@ -478,11 +476,11 @@
                                                     {{  number_format($item['eggs'], 0, ',', '.') }} Butir
                                                 </td>
                                             </tr>
-                                            @empty
+                                        @empty
                                             <tr>
                                                 <td class="text-sm font-normal p-4">Data tidak ada!</td>
                                             </tr>
-                                            @endforelse
+                                        @endforelse
                                     </tbody>
                                 </table>
                                 <div>{{ $this->summaryEmployees->links() }}</div>

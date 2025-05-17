@@ -172,7 +172,6 @@
                     @endpush
                 </section>
             </div>
-          
         </div>
     </div>
 </div>

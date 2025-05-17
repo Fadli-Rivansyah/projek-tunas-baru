@@ -43,7 +43,7 @@ class ChickenPageAdmin extends Component
             ->paginate(10);
 
         foreach ($kandangData as $kandang) {
-            $kandang->total_ayam_terbaru = $kandang->jumlah_ayam -  $kandang->jumlah_ayam_mati;
+            $kandang->total_ayam_terbaru = $kandang->jumlah_ayam - $kandang->jumlah_ayam_mati;
         }
 
         return $kandangData;
